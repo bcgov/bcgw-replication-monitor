@@ -1,5 +1,6 @@
 import express from "express";
 import jobRunsRoutes from "./http/jobRuns.routes";
+import { config } from "./config";
 
 const app = express();
 
@@ -13,7 +14,6 @@ app.get("/health", (_, res) => {
 // Mount API routes
 app.use("/api", jobRunsRoutes);
 
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.listen(config.port, () => {
+  console.log(`Server running on port ${config.port}`);
 });
