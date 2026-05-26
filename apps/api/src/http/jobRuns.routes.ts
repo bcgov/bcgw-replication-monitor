@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { FakeJobRunRepository } from "../adapters/FakeJobRunRepository";
+import { createJobRunRepository } from "../infrastructure/repositoryFactory";
 import { toDto } from "./jobRun.mapper";
 
 /**
@@ -9,7 +9,7 @@ import { toDto } from "./jobRun.mapper";
  */
 const router = Router();
 
-const repo = new FakeJobRunRepository();
+const repo = createJobRunRepository();
 
 /**
  * GET /api/job-runs
