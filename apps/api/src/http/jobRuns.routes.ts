@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { FakeJobRunRepository } from "../adapters/FakeJobRunRepository";
+import { toDto } from "./jobRun.mapper";
 
 /**
  * Routes for job runs endpoints.
@@ -17,7 +18,7 @@ const repo = new FakeJobRunRepository();
  */
 router.get("/job-runs", async (_req, res) => {
   const jobRuns = await repo.getJobRuns();
-  res.json(jobRuns);
+  res.json(jobRuns.map(toDto));
 });
 
 export default router;
