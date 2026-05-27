@@ -25,11 +25,17 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      - name: Format check
+        run: npx prettier --check "./**/*.{ts,js,json}"
+
       - name: Lint
         run: npm run lint
 
       - name: Type check
         run: npx tsc --noEmit
+
+      - name: Security audit
+        run: npm audit --audit-level=moderate
 
   web:
     name: Web Checks
@@ -51,8 +57,14 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      - name: Format check
+        run: npx prettier --check "./**/*.{ts,js,json}"
+
       - name: Lint
         run: npm run lint
 
       - name: Type check
         run: npx tsc --noEmit
+
+      - name: Security audit
+        run: npm audit --audit-level=moderate
