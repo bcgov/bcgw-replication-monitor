@@ -1,21 +1,32 @@
 # BCGW Replication Monitor
 
-Web application for monitoring BCGW replication (ETL) job runs across different data sources.
+Web application for monitoring BCGW replication job runs across different data sources.
 
 ## Tech Stack
 
 - **Backend**: Node.js, Express, TypeScript
 - **Frontend**: React, Vite, TypeScript
 - **Architecture**: Lite hexagonal architecture
-- **Deployment**: OpenShift (Kong routing + SSO)
 
-## Project Structure
+## Architecture
+
+Monorepo with lite hexagonal architecture.
 
 ```
 apps/
-  api/    # Backend service
-  web/    # Frontend (React)
+  api/                   # Backend (Express + TypeScript)
+    src/
+      domain/            # Core business models (JobRun)
+      ports/             # Interfaces (e.g. JobRunRepository)
+      adapters/          # Implementations (Fake, Oracle)
+      http/              # Routes and mappers
+      infrastructure/    # Config, factories, DB
+  web/                   # Frontend (React + Vite)
+packages/
+  shared/                # Shared types (DTOs, enums)
 ```
+
+The backend uses ports and adapters to decouple the domain from data sources.
 
 ## Running Locally
 
@@ -39,6 +50,13 @@ npm run dev
 
 Runs on `http://localhost:5173`
 
+## Running with Fake vs Oracle Data
+
+Controlled by `USE_FAKE_REPO` in `apps/api/.env`:
+
+- `USE_FAKE_REPO=true` — uses in-memory test data (default)
+- `USE_FAKE_REPO=false` — connects to Oracle
+
 ## Environment Variables
 
 ### Backend (`apps/api/.env`)
@@ -46,7 +64,7 @@ Runs on `http://localhost:5173`
 | Variable | Description | Default |
 |---|---|---|
 | `PORT` | Server port | `3000` |
-| `USE_FAKE_REPO` | Use in-memory fake data | `true` |
+| `USE_FAKE_REPO` | Use in-memory data instead of Oracle | `true` |
 
 ## Docker
 
@@ -68,7 +86,3 @@ docker build -t repl-monitor-api .
 cd apps/web
 docker build -t repl-monitor-web .
 ```
-
-## Notes
-
-- Kong handles routing and authentication in deployed environments
