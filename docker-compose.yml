@@ -1,0 +1,14 @@
+services:
+  api:
+    build: ./apps/api
+    ports:
+      - "3000:3000"
+    environment:
+      - USE_FAKE_REPO=true
+
+  web:
+    build: ./apps/web
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api
