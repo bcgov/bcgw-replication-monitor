@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "@bcgov/design-system-react-components";
-import { AppFooter } from "./AppFooter";
+import { AppFooter } from "../components/AppFooter";
 
 /**
  * Root layout used by all pages.
