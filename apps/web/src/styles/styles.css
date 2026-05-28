@@ -1,0 +1,24 @@
+.footer-links {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  color: rgb(70, 67, 65);
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+p.bcds-footer--copyright {
+  font-size: 14px !important;
+}
+
+.footer-links a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
