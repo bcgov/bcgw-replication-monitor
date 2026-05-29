@@ -17,15 +17,15 @@ describe("AppFooter", () => {
 
     expect(screen.getByText("Disclaimer").closest("a")).toHaveAttribute(
       "href",
-      "https://www2.gov.bc.ca/gov/content/home/disclaimer"
+      "https://www2.gov.bc.ca/gov/content/home/disclaimer",
     );
     expect(screen.getByText("Privacy").closest("a")).toHaveAttribute(
       "href",
-      "https://www2.gov.bc.ca/gov/content/home/privacy"
+      "https://www2.gov.bc.ca/gov/content/home/privacy",
     );
     expect(screen.getByText("Copyright").closest("a")).toHaveAttribute(
       "href",
-      "https://www2.gov.bc.ca/gov/content/home/copyright"
+      "https://www2.gov.bc.ca/gov/content/home/copyright",
     );
   });
 });

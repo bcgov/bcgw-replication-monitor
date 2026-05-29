@@ -1,26 +1,26 @@
-
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import { AppLayout } from "./AppLayout"
+import { AppLayout } from "./AppLayout";
 
 describe("AppLayout", () => {
   it("renders the header with title", () => {
     render(
       <MemoryRouter>
         <AppLayout />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    expect(screen.getByText("BCGW Replication Monitoring Dashboard")).toBeInTheDocument();
-
+    expect(
+      screen.getByText("BCGW Replication Monitoring Dashboard"),
+    ).toBeInTheDocument();
   });
 
   it("renders the footer", () => {
     render(
       <MemoryRouter>
         <AppLayout />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText(/Disclaimer/i)).toBeInTheDocument();
     expect(screen.getByText(/Privacy/i)).toBeInTheDocument();
