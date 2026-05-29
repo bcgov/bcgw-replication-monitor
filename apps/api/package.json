@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "lint:fix": "eslint --fix \"./**/*.{js,ts}\"",
     "lint": "eslint \"./**/*.{js,ts}\"",
-    "format": "prettier --write \"./**/*.{js,ts,json}\""
+    "format": "prettier --write \"./**/*.{js,ts,json}\"",
+    "test": "echo \"No tests yet\" && exit 0"
   },
   "keywords": [],
   "author": "",
