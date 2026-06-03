@@ -1,5 +1,6 @@
 import { JobRun } from "../domain/JobRun";
 import { JobRunRepository } from "../ports/JobRunRepository";
+import { JobRunQuery } from "../domain/JobRunQuery";
 
 /**
  * Static seed data used when running without a real Oracle connection.
@@ -42,9 +43,10 @@ const SAMPLE: JobRun[] = [
 ];
 
 /**
- * Fake implementation of {@link JobRunRepository}.
+ * Fake implementation of JobRunRepository.
  *
- * Returns static data to allow development without a real data source.
+ * Returns static data filtered in-memory.
+ * Used for local development and testing.
  */
 export class FakeJobRunRepository implements JobRunRepository {
   private readonly data: JobRun[];
@@ -53,7 +55,24 @@ export class FakeJobRunRepository implements JobRunRepository {
     this.data = data;
   }
 
-  async getJobRuns(): Promise<JobRun[]> {
-    return this.data;
+  async find(query: JobRunQuery): Promise<JobRun[]> {
+    let results = [...this.data];
+
+    if (query.status) {
+      results = results.filter((r) => r.status === query.status);
+    }
+
+    if (query.search) {
+      const term = query.search.toLowerCase();
+      results = results.filter(
+        (r) =>
+          r.srcTable.toLowerCase().includes(term) ||
+          r.destTable.toLowerCase().includes(term) ||
+          r.srcSchema.toLowerCase().includes(term) ||
+          r.destSchema.toLowerCase().includes(term),
+      );
+    }
+
+    return results;
   }
 }
