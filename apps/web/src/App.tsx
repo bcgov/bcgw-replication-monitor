@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
+import { JobRunsPage } from "./pages/JobRunsPage";
 
 /**
  * Root app router.
@@ -11,7 +12,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<AppLayout />}>
-          <Route index element={<div>Home page</div>} />
+          <Route index element={<JobRunsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
