@@ -62,6 +62,17 @@ export class FakeJobRunRepository implements JobRunRepository {
       results = results.filter((r) => r.status === query.status);
     }
 
+    if (query.gateway) {
+      results = results.filter((r) => r.gateway === query.gateway);
+    }
+
+    if (query.destSchema) {
+      const term = query.destSchema.toLowerCase();
+      results = results.filter((r) =>
+        r.destSchema.toLowerCase().includes(term),
+      );
+    }
+
     if (query.search) {
       const term = query.search.toLowerCase();
       results = results.filter(
@@ -71,6 +82,10 @@ export class FakeJobRunRepository implements JobRunRepository {
           r.srcSchema.toLowerCase().includes(term) ||
           r.destSchema.toLowerCase().includes(term),
       );
+    }
+
+    if (query.dbInstance) {
+      results = results.filter((r) => r.dbInstance === query.dbInstance);
     }
 
     return results;
