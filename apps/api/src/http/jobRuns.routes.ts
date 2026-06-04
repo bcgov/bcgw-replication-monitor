@@ -1,35 +1,32 @@
 import { Router } from "express";
-import { createJobRunRepository } from "../infrastructure/repositoryFactory";
+import { JobRunRepository } from "../ports/JobRunRepository";
 import { toDto } from "./jobRun.mapper";
 import { JobRunsQuerySchema } from "./jobRuns.validation";
 
-const router = Router();
-const repo = createJobRunRepository();
-
 /**
- * GET /api/job-runs
- *
- * Supports optional query params:
- * - search: filters across srcTable, destTable, srcSchema, destSchema
- * - status: filters by job run status
+ * Creates the job runs router.
  */
-router.get("/job-runs", async (req, res) => {
-  const parsed = JobRunsQuerySchema.safeParse(req.query);
+export function jobRunsRouter(repo: JobRunRepository): Router {
+  const router = Router();
 
-  if (!parsed.success) {
-    return res.status(400).json({
-      error: "Invalid query",
-      details: parsed.error.issues,
-    });
-  }
+  router.get("/job-runs", async (req, res) => {
+    const parsed = JobRunsQuerySchema.safeParse(req.query);
 
-  try {
-    const jobRuns = await repo.find(parsed.data);
-    return res.json(jobRuns.map(toDto));
-  } catch (err) {
-    console.error("job-runs list failed", err);
-    return res.status(500).json({ error: "Internal error" });
-  }
-});
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: "Invalid query",
+        details: parsed.error.issues,
+      });
+    }
 
-export default router;
+    try {
+      const jobRuns = await repo.find(parsed.data);
+      return res.json(jobRuns.map(toDto));
+    } catch (err) {
+      console.error("job-runs list failed", err);
+      return res.status(500).json({ error: "Internal error" });
+    }
+  });
+
+  return router;
+}
