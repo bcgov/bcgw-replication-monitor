@@ -1,7 +1,14 @@
+export const JOB_RUN_STATUSES = [
+  "success",
+  "failed",
+  "unchanged",
+  "unknown",
+] as const;
+
 /**
  * TEMP local types (will move to shared later)
  */
-export type JobRunStatus = "success" | "failed" | "unchanged" | "unknown";
+export type JobRunStatus = (typeof JOB_RUN_STATUSES)[number];
 export type JobRunType = "fme" | "oracle" | "sdr" | "other";
 export type JobRunUpdateType = "full" | "incremental" | "mapsheet" | "force";
 export type DbInstance = "dlv" | "test" | "prod";
