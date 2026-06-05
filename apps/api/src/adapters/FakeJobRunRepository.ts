@@ -2,6 +2,7 @@ import { JobRun } from "../domain/JobRun";
 import { JobRunRepository } from "../ports/JobRunRepository";
 import { JobRunQuery } from "../domain/jobRunQuery";
 import { JobRunPage } from "../domain/jobRunPage";
+import { sortJobRuns, paginate } from "./queryUtils";
 
 /**
  * Static seed data used when running without a real Oracle connection.
@@ -89,11 +90,14 @@ export class FakeJobRunRepository implements JobRunRepository {
       results = results.filter((r) => r.dbInstance === query.dbInstance);
     }
 
+    // Sort
+    results = sortJobRuns(results, query.sortBy, query.sortDir);
+
     // Total after filtering, before pagination
     const total = results.length;
 
-    // Apply pagination
-    results = results.slice(query.offset, query.offset + query.limit);
+    // Paginate
+    results = paginate(results, query.offset, query.limit);
 
     return { items: results, total };
   }

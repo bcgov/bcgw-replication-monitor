@@ -80,6 +80,36 @@ describe("GET /api/job-runs", () => {
     expect(res.body.total).toBe(2);
   });
 
+  it("sorts by status ascending", async () => {
+    const res = await request(app).get(
+      "/api/job-runs?sortBy=status&sortDir=asc",
+    );
+
+    expect(res.status).toBe(200);
+    const statuses = res.body.items.map((r: { status: string }) => r.status);
+    expect(statuses).toEqual([...statuses].sort());
+  });
+
+  it("sorts by status descending", async () => {
+    const res = await request(app).get(
+      "/api/job-runs?sortBy=status&sortDir=desc",
+    );
+
+    expect(res.status).toBe(200);
+    const statuses = res.body.items.map((r: { status: string }) => r.status);
+    expect(statuses).toEqual([...statuses].sort().reverse());
+  });
+
+  it("defaults to sorting by lastConverted desc", async () => {
+    const res = await request(app).get("/api/job-runs");
+
+    expect(res.status).toBe(200);
+    const dates = res.body.items.map(
+      (r: { lastConverted: string }) => r.lastConverted,
+    );
+    expect(dates).toEqual([...dates].sort().reverse());
+  });
+
   it("returns dates as ISO strings", async () => {
     const res = await request(app).get("/api/job-runs");
 
@@ -103,6 +133,20 @@ describe("GET /api/job-runs", () => {
 
   it("returns 400 for invalid dbInstance", async () => {
     const res = await request(app).get("/api/job-runs?dbInstance=invalid");
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("Invalid query");
+  });
+
+  it("returns 400 for invalid sortBy", async () => {
+    const res = await request(app).get("/api/job-runs?sortBy=invalid");
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("Invalid query");
+  });
+
+  it("returns 400 for invalid sortDir", async () => {
+    const res = await request(app).get("/api/job-runs?sortDir=invalid");
 
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("Invalid query");

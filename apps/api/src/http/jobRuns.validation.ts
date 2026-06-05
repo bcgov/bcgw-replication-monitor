@@ -3,6 +3,8 @@ import {
   JOB_RUN_STATUSES,
   JOB_RUN_TYPES,
   DB_INSTANCES,
+  JOB_RUN_SORT_FIELDS,
+  SORT_DIRECTIONS,
 } from "../domain/JobRun";
 
 /**
@@ -18,6 +20,8 @@ export const JobRunsQuerySchema = z.object({
   dbInstance: z.enum(DB_INSTANCES).optional(),
   limit: z.coerce.number().int().min(1).max(200).default(50),
   offset: z.coerce.number().int().min(0).default(0),
+  sortBy: z.enum(JOB_RUN_SORT_FIELDS).default("lastConverted"),
+  sortDir: z.enum(SORT_DIRECTIONS).default("desc"),
 });
 
 export type JobRunsQuery = z.infer<typeof JobRunsQuerySchema>;

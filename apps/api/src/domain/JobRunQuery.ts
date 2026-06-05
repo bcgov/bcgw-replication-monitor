@@ -11,4 +11,6 @@ export interface JobRunQuery {
   dbInstance?: DbInstance;
   limit: number;
   offset: number;
+  sortBy: JobRunSortField;
+  sortDir: SortDirection;
 }
