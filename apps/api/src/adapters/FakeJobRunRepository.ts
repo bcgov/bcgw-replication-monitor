@@ -1,6 +1,7 @@
 import { JobRun } from "../domain/JobRun";
 import { JobRunRepository } from "../ports/JobRunRepository";
-import { JobRunQuery } from "../domain/JobRunQuery";
+import { JobRunQuery } from "../domain/jobRunQuery";
+import { JobRunPage } from "../domain/jobRunPage";
 
 /**
  * Static seed data used when running without a real Oracle connection.
@@ -55,7 +56,7 @@ export class FakeJobRunRepository implements JobRunRepository {
     this.data = data;
   }
 
-  async find(query: JobRunQuery): Promise<JobRun[]> {
+  async find(query: JobRunQuery): Promise<JobRunPage> {
     let results = [...this.data];
 
     if (query.status) {
@@ -88,6 +89,12 @@ export class FakeJobRunRepository implements JobRunRepository {
       results = results.filter((r) => r.dbInstance === query.dbInstance);
     }
 
-    return results;
+    // Total after filtering, before pagination
+    const total = results.length;
+
+    // Apply pagination
+    results = results.slice(query.offset, query.offset + query.limit);
+
+    return { items: results, total };
   }
 }

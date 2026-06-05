@@ -1,5 +1,5 @@
-import { JobRun } from "../domain/JobRun";
-import { JobRunQuery } from "../domain/JobRunQuery";
+import { JobRunPage } from "../domain/jobRunPage";
+import { JobRunQuery } from "../domain/jobRunQuery";
 
 /**
  * Port for accessing job run data.
@@ -7,5 +7,5 @@ import { JobRunQuery } from "../domain/JobRunQuery";
  * Implementations (adapters) handle the actual data retrieval.
  */
 export interface JobRunRepository {
-  find(query: JobRunQuery): Promise<JobRun[]>;
+  find(query: JobRunQuery): Promise<JobRunPage>;
 }

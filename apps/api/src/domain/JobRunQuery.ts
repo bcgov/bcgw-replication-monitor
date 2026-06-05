@@ -9,4 +9,6 @@ export interface JobRunQuery {
   gateway?: JobRunType;
   destSchema?: string;
   dbInstance?: DbInstance;
+  limit: number;
+  offset: number;
 }

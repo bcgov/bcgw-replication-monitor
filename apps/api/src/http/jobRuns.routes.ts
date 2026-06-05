@@ -20,8 +20,13 @@ export function jobRunsRouter(repo: JobRunRepository): Router {
     }
 
     try {
-      const jobRuns = await repo.find(parsed.data);
-      return res.json(jobRuns.map(toDto));
+      const { items, total } = await repo.find(parsed.data);
+      return res.json({
+        items: items.map(toDto),
+        total,
+        limit: parsed.data.limit,
+        offset: parsed.data.offset,
+      });
     } catch (err) {
       console.error("job-runs list failed", err);
       return res.status(500).json({ error: "Internal error" });
