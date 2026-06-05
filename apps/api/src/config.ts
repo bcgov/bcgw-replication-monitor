@@ -4,7 +4,13 @@ dotenv.config();
 
 export const config = {
   port: Number(process.env.PORT) || 3000,
-
-  /** When true, use in-memory fake data instead of Oracle. */
   useFakeRepo: process.env.USE_FAKE_REPO !== "false",
+
+  /** Oracle connection — required when useFakeRepo is false */
+  oracle: {
+    user: process.env.ORACLE_USER || "",
+    password: process.env.ORACLE_PASSWORD || "",
+    connectString: process.env.ORACLE_CONNECT_STRING || "",
+    view: process.env.ORACLE_VIEW || "ETL_JOB_RUNS_V",
+  },
 };
