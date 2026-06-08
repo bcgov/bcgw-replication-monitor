@@ -1,8 +1,8 @@
 import oracledb from "oracledb";
 import { JobRun } from "../domain/JobRun";
 import { JobRunRepository } from "../ports/JobRunRepository";
-import { JobRunQuery } from "../domain/jobRunQuery";
-import { JobRunPage } from "../domain/jobRunPage";
+import { JobRunQuery } from "../domain/JobRunQuery";
+import { JobRunPage } from "../domain/JobRunPage";
 
 /**
  * Oracle implementation of JobRunRepository.

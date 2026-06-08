@@ -1,4 +1,4 @@
-import { JobRunStatus, JobRunType, DbInstance } from "./JobRun";
+import { JobRunStatus, JobRunType, DbInstance, JobRunSortField, SortDirection } from "./JobRun";
 
 /**
  * Query parameters for fetching job runs.

@@ -1,5 +1,5 @@
-import { JobRunPage } from "../domain/jobRunPage";
-import { JobRunQuery } from "../domain/jobRunQuery";
+import { JobRunPage } from "../domain/JobRunPage";
+import { JobRunQuery } from "../domain/JobRunQuery";
 
 /**
  * Port for accessing job run data.
