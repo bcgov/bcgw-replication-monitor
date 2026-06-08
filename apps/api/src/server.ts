@@ -1,19 +1,14 @@
-import express from "express";
-import jobRunsRoutes from "./http/jobRuns.routes";
 import { config } from "./config";
+import { createJobRunRepository } from "./infrastructure/repositoryFactory";
+import { createApp } from "./app";
 
-const app = express();
+async function start() {
+  const repo = await createJobRunRepository();
+  const app = createApp(repo);
 
-app.use(express.json());
+  app.listen(config.port, () => {
+    console.log(`Server running on port ${config.port}`);
+  });
+}
 
-// Health check
-app.get("/health", (_, res) => {
-  res.send("OK");
-});
-
-// Mount API routes
-app.use("/api", jobRunsRoutes);
-
-app.listen(config.port, () => {
-  console.log(`Server running on port ${config.port}`);
-});
+start();
