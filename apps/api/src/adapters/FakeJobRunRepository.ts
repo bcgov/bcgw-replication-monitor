@@ -60,12 +60,16 @@ export class FakeJobRunRepository implements JobRunRepository {
   async find(query: JobRunQuery): Promise<JobRunPage> {
     let results = [...this.data];
 
-    if (query.status) {
-      results = results.filter((r) => r.status === query.status);
+    if (query.status?.length) {
+      results = results.filter((r) => query.status!.includes(r.status));
     }
 
-    if (query.gateway) {
-      results = results.filter((r) => r.gateway === query.gateway);
+    if (query.gateway?.length) {
+      results = results.filter((r) => query.gateway!.includes(r.gateway));
+    }
+
+    if (query.dbInstance?.length) {
+      results = results.filter((r) => query.dbInstance!.includes(r.dbInstance));
     }
 
     if (query.destSchema) {
@@ -84,10 +88,6 @@ export class FakeJobRunRepository implements JobRunRepository {
           r.srcSchema.toLowerCase().includes(term) ||
           r.destSchema.toLowerCase().includes(term),
       );
-    }
-
-    if (query.dbInstance) {
-      results = results.filter((r) => r.dbInstance === query.dbInstance);
     }
 
     // Sort

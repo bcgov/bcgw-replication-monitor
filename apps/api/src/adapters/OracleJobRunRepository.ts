@@ -76,19 +76,28 @@ export class OracleJobRunRepository implements JobRunRepository {
     const conditions: string[] = [];
     const params: Record<string, string | number> = {};
 
-    if (query.status) {
-      conditions.push("LAST_STATUS = :status");
-      params.status = this.mapStatusToDb(query.status);
+    if (query.status?.length) {
+      const placeholders = query.status.map((_, i) => `:status${i}`);
+      conditions.push(`LAST_STATUS IN (${placeholders.join(", ")})`);
+      query.status.forEach((s, i) => {
+        params[`status${i}`] = this.mapStatusToDb(s);
+      });
     }
 
-    if (query.gateway) {
-      conditions.push("APPLICATION_ACRONYM = :gateway");
-      params.gateway = query.gateway.toUpperCase();
+    if (query.gateway?.length) {
+      const placeholders = query.gateway.map((_, i) => `:gateway${i}`);
+      conditions.push(`APPLICATION_ACRONYM IN (${placeholders.join(", ")})`);
+      query.gateway.forEach((g, i) => {
+        params[`gateway${i}`] = g.toUpperCase();
+      });
     }
 
-    if (query.dbInstance) {
-      conditions.push("DB_INSTANCE = :dbInstance");
-      params.dbInstance = query.dbInstance.toUpperCase();
+    if (query.dbInstance?.length) {
+      const placeholders = query.dbInstance.map((_, i) => `:db${i}`);
+      conditions.push(`DB_INSTANCE IN (${placeholders.join(", ")})`);
+      query.dbInstance.forEach((d, i) => {
+        params[`db${i}`] = d.toUpperCase();
+      });
     }
 
     if (query.destSchema) {
