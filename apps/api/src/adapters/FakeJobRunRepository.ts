@@ -58,6 +58,13 @@ export class FakeJobRunRepository implements JobRunRepository {
   }
 
   async find(query: JobRunQuery): Promise<JobRunPage> {
+    if (
+      (query.status && query.status.length === 0) ||
+      (query.gateway && query.gateway.length === 0) ||
+      (query.dbInstance && query.dbInstance.length === 0)
+    ) {
+      return { items: [], total: 0 };
+    }
     let results = [...this.data];
 
     if (query.status?.length) {

@@ -73,6 +73,17 @@ export class OracleJobRunRepository implements JobRunRepository {
 
     params: Record<string, string | number>;
   } {
+    // If any filter is explicitly empty, return no results
+    if (
+      (query.status && query.status.length === 0) ||
+      (query.gateway && query.gateway.length === 0) ||
+      (query.dbInstance && query.dbInstance.length === 0)
+    ) {
+      return {
+        where: "WHERE 1=0",
+        params: {},
+      };
+    }
     const conditions: string[] = [];
     const params: Record<string, string | number> = {};
 
