@@ -2,10 +2,23 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { JobRunsResults } from "./JobRunsResults";
 
-const mockData = [
-  { id: "1", srcTable: "Job A", status: "SUCCESS" },
-  { id: "2", srcTable: "Job B", status: "FAILED" },
-];
+const mockData = {
+  items: [
+    {
+      id: "1",
+      srcTable: "TABLE_A",
+      status: "success",
+    },
+    {
+      id: "2",
+      srcTable: "TABLE_B",
+      status: "failed",
+    },
+  ],
+  total: 2,
+  limit: 50,
+  offset: 0,
+};
 
 describe("JobRunsResults", () => {
   it("renders job runs", () => {
@@ -13,8 +26,8 @@ describe("JobRunsResults", () => {
       <JobRunsResults data={mockData} isLoading={false} isError={false} />,
     );
 
-    expect(screen.getByText(/Job A/)).toBeInTheDocument();
-    expect(screen.getByText(/Job B/)).toBeInTheDocument();
+    expect(screen.getByText(/TABLE_A/)).toBeInTheDocument();
+    expect(screen.getByText(/TABLE_B/)).toBeInTheDocument();
   });
 
   it("shows loading state", () => {
