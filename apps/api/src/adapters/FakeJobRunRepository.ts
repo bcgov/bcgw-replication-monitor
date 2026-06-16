@@ -23,7 +23,7 @@ const SAMPLE: JobRun[] = [
     updateType: "full",
     recordsRead: 1000,
     recordsWritten: 1000,
-    dbInstance: "dlv",
+    dbInstance: "prod",
   },
   {
     gateway: "oracle",
@@ -40,7 +40,7 @@ const SAMPLE: JobRun[] = [
     updateType: "incremental",
     recordsRead: 500,
     recordsWritten: 0,
-    dbInstance: "dlv",
+    dbInstance: "test",
   },
 ];
 
