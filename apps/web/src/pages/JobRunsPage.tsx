@@ -7,10 +7,17 @@ import { JobRunsResults } from "../components/JobRunsResults";
 import { DEFAULT_FILTERS } from "../constants/filterDefaults";
 import { useState } from "react";
 
+interface JobRunsResponse {
+  items: JobRun[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 export function JobRunsPage() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
-  const { data, isLoading, isError } = useQuery<JobRun[]>({
+  const { data, isLoading, isError } = useQuery<JobRunsResponse>({
     queryKey: ["job-runs", filters],
     queryFn: () => {
       const params = new URLSearchParams();

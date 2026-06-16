@@ -2,7 +2,12 @@ import { useState } from "react";
 import type { JobRun } from "../types/jobRun";
 
 interface Props {
-  data?: JobRun[];
+  data?: {
+    items: JobRun[];
+    total: number;
+    limit: number;
+    offset: number;
+  };
   isLoading: boolean;
   isError: boolean;
 }
@@ -10,10 +15,7 @@ interface Props {
 export function JobRunsResults({ data, isLoading, isError }: Props) {
   const [search, setSearch] = useState("");
 
-  const filteredData =
-    data?.filter((job) =>
-      job.srcTable.toLowerCase().includes(search.toLowerCase()),
-    ) || [];
+  const items = data?.items ?? [];
 
   return (
     <div>
@@ -32,9 +34,9 @@ export function JobRunsResults({ data, isLoading, isError }: Props) {
       {isLoading && <div>Loading job runs...</div>}
       {isError && <div>Failed to load job runs</div>}
 
-      {filteredData && (
+      {items.length > 0 && (
         <ul>
-          {filteredData.map((job) => (
+          {items.map((job) => (
             <li key={job.id}>
               {job.srcTable} — {job.status}
             </li>
