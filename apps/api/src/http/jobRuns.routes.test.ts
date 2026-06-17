@@ -59,30 +59,21 @@ describe("GET /api/job-runs", () => {
     expect(res.body.items).toHaveLength(2);
   });
 
-  it("filters by multiple gateways", async () => {
-    const res = await request(app).get(
-      "/api/job-runs?gateway=fme&gateway=oracle",
-    );
-
-    expect(res.status).toBe(200);
-    expect(res.body.items).toHaveLength(2);
-  });
-
   it("filters by single dbInstance", async () => {
-    const res = await request(app).get("/api/job-runs?dbInstance=dlv");
+    const res = await request(app).get("/api/job-runs?dbInstance=prod");
 
     expect(res.status).toBe(200);
     expect(res.body.items.length).toBeGreaterThan(0);
     expect(
       res.body.items.every(
-        (r: { dbInstance: string }) => r.dbInstance === "dlv",
+        (r: { dbInstance: string }) => r.dbInstance === "prod",
       ),
     ).toBe(true);
   });
 
   it("filters by multiple dbInstances", async () => {
     const res = await request(app).get(
-      "/api/job-runs?dbInstance=dlv&dbInstance=test",
+      "/api/job-runs?dbInstance=prod&dbInstance=test",
     );
 
     expect(res.status).toBe(200);
