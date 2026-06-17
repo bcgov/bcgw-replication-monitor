@@ -11,10 +11,10 @@ import {
  */
 export interface JobRunQuery {
   search?: string;
-  status?: JobRunStatus;
-  gateway?: JobRunType;
+  status?: JobRunStatus[];
+  gateway?: JobRunType[];
+  dbInstance?: DbInstance[];
   destSchema?: string;
-  dbInstance?: DbInstance;
   limit: number;
   offset: number;
   sortBy: JobRunSortField;

@@ -4,16 +4,35 @@ import type { JobRun } from "../types/jobRun";
 import { FiltersPanel } from "../components/FiltersPanel";
 import { AdvancedFilters } from "../components/AdvancedFilters";
 import { JobRunsResults } from "../components/JobRunsResults";
+import { DEFAULT_FILTERS } from "../constants/filterDefaults";
+import { useState } from "react";
+
+interface JobRunsResponse {
+  items: JobRun[];
+  total: number;
+  limit: number;
+  offset: number;
+}
 
 export function JobRunsPage() {
-  const { data, isLoading, isError } = useQuery<JobRun[]>({
-    queryKey: ["job-runs"],
-    queryFn: () => apiFetch("/job-runs"),
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+
+  const { data, isLoading, isError } = useQuery<JobRunsResponse>({
+    queryKey: ["job-runs", filters],
+    queryFn: () => {
+      const params = new URLSearchParams();
+
+      filters.status.forEach((s) => params.append("status", s));
+      filters.gateway.forEach((g) => params.append("gateway", g));
+      filters.dbInstance.forEach((d) => params.append("dbInstance", d));
+
+      return apiFetch(`/job-runs?${params.toString()}`);
+    },
   });
 
   return (
     <div style={{ display: "flex", gap: "1rem" }}>
-      <FiltersPanel />
+      <FiltersPanel filters={filters} onChange={setFilters} />
 
       <section style={{ flex: 1, padding: "1rem" }}>
         <AdvancedFilters />

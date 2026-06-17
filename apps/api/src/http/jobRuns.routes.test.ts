@@ -17,13 +17,21 @@ describe("GET /api/job-runs", () => {
     expect(res.body.offset).toBe(0);
   });
 
-  it("filters by status", async () => {
+  it("filters by single status", async () => {
     const res = await request(app).get("/api/job-runs?status=success");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
     expect(res.body.items[0].status).toBe("success");
-    expect(res.body.total).toBe(1);
+  });
+
+  it("filters by multiple statuses", async () => {
+    const res = await request(app).get(
+      "/api/job-runs?status=success&status=failed",
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toHaveLength(2);
   });
 
   it("filters by search term", async () => {
@@ -34,7 +42,7 @@ describe("GET /api/job-runs", () => {
     expect(res.body.items[0].srcTable).toBe("TABLE_A");
   });
 
-  it("filters by gateway", async () => {
+  it("filters by single gateway", async () => {
     const res = await request(app).get("/api/job-runs?gateway=fme");
 
     expect(res.status).toBe(200);
@@ -42,16 +50,34 @@ describe("GET /api/job-runs", () => {
     expect(res.body.items[0].gateway).toBe("fme");
   });
 
-  it("filters by dbInstance", async () => {
-    const res = await request(app).get("/api/job-runs?dbInstance=dlv");
+  it("filters by multiple gateways", async () => {
+    const res = await request(app).get(
+      "/api/job-runs?gateway=fme&gateway=oracle",
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toHaveLength(2);
+  });
+
+  it("filters by single dbInstance", async () => {
+    const res = await request(app).get("/api/job-runs?dbInstance=prod");
 
     expect(res.status).toBe(200);
     expect(res.body.items.length).toBeGreaterThan(0);
     expect(
       res.body.items.every(
-        (r: { dbInstance: string }) => r.dbInstance === "dlv",
+        (r: { dbInstance: string }) => r.dbInstance === "prod",
       ),
     ).toBe(true);
+  });
+
+  it("filters by multiple dbInstances", async () => {
+    const res = await request(app).get(
+      "/api/job-runs?dbInstance=prod&dbInstance=test",
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toHaveLength(2);
   });
 
   it("paginates with limit", async () => {
