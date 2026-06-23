@@ -177,4 +177,34 @@ describe("GET /api/job-runs", () => {
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("Invalid query");
   });
+
+  it("returns counts in response", async () => {
+    const res = await request(app).get("/api/job-runs");
+
+    expect(res.status).toBe(200);
+    expect(res.body.counts).toBeDefined();
+    expect(res.body.counts.all).toBe(2);
+    expect(res.body.counts.success).toBe(1);
+    expect(res.body.counts.failed).toBe(1);
+  });
+
+  it("counts ignore the status filter", async () => {
+    // Filter by only "success" — counts should still show both
+    const res = await request(app).get("/api/job-runs?status=success");
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toHaveLength(1);
+    expect(res.body.counts.all).toBe(2);
+    expect(res.body.counts.success).toBe(1);
+    expect(res.body.counts.failed).toBe(1);
+  });
+
+  it("counts respect non-status filters", async () => {
+    const res = await request(app).get("/api/job-runs?gateway=fme");
+
+    expect(res.status).toBe(200);
+    expect(res.body.counts.all).toBe(1);
+    expect(res.body.counts.success).toBe(1);
+    expect(res.body.counts.failed).toBe(0);
+  });
 });

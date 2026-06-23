@@ -19,31 +19,73 @@ export class OracleJobRunRepository implements JobRunRepository {
     const connection = await this.pool.getConnection();
 
     try {
+      // Empty array filter, return no results
+      if (
+        (query.status && query.status.length === 0) ||
+        (query.gateway && query.gateway.length === 0) ||
+        (query.dbInstance && query.dbInstance.length === 0)
+      ) {
+        return {
+          items: [],
+          total: 0,
+          counts: { all: 0, success: 0, failed: 0 },
+        };
+      }
+
+      //  Build WHERE for counts (everything EXCEPT status)
+      const { where: countsWhere, params: countsParams } = this.buildWhere({
+        ...query,
+        status: undefined, // ignore status for counts
+      });
+
+      // Counts query, group by status
+      const countsSql = `
+      SELECT LAST_STATUS, COUNT(*) AS CNT
+      FROM ${this.view}
+      ${countsWhere}
+      GROUP BY LAST_STATUS
+    `;
+
+      const countsResult = await connection.execute<{
+        LAST_STATUS: string;
+        CNT: number;
+      }>(countsSql, countsParams, {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+      });
+
+      const counts = { all: 0, success: 0, failed: 0 };
+      (countsResult.rows ?? []).forEach((row) => {
+        const status = this.mapStatus(row.LAST_STATUS);
+        counts.all += row.CNT;
+        if (status === "success") counts.success += row.CNT;
+        if (status === "failed") counts.failed += row.CNT;
+      });
+
+      // Apply status filter for items
       const { where, params } = this.buildWhere(query);
 
-      // ✅ Total count (before pagination)
-      const countSql = `SELECT COUNT(*) AS TOTAL FROM ${this.view} ${where}`;
-      const countResult = await connection.execute<{ TOTAL: number }>(
-        countSql,
+      // Total count (after all filters)
+      const totalSql = `SELECT COUNT(*) AS TOTAL FROM ${this.view} ${where}`;
+      const totalResult = await connection.execute<{ TOTAL: number }>(
+        totalSql,
         params,
         { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
+      const total = totalResult.rows?.[0]?.TOTAL ?? 0;
 
-      const total = countResult.rows?.[0]?.TOTAL ?? 0;
-
-      // ✅ Data query with sorting + pagination
+      // Data query with sorting + pagination
       const dataSql = `
-        SELECT * FROM (
-          SELECT a.*, ROWNUM rnum FROM (
-            SELECT *
-            FROM ${this.view}
-            ${where}
-            ORDER BY ${this.mapSortField(query.sortBy)} ${query.sortDir.toUpperCase()}
-          ) a
-          WHERE ROWNUM <= :maxRow
-        )
-        WHERE rnum > :minRow
-      `;
+      SELECT * FROM (
+        SELECT a.*, ROWNUM rnum FROM (
+          SELECT *
+          FROM ${this.view}
+          ${where}
+          ORDER BY ${this.mapSortField(query.sortBy)} ${query.sortDir.toUpperCase()}
+        ) a
+        WHERE ROWNUM <= :maxRow
+      )
+      WHERE rnum > :minRow
+    `;
 
       const dataParams: Record<string, string | number> = {
         ...params,
@@ -59,7 +101,7 @@ export class OracleJobRunRepository implements JobRunRepository {
 
       const items = (dataResult.rows ?? []).map((row) => this.mapRow(row));
 
-      return { items, total };
+      return { items, total, counts };
     } finally {
       await connection.close();
     }

@@ -58,19 +58,22 @@ export class FakeJobRunRepository implements JobRunRepository {
   }
 
   async find(query: JobRunQuery): Promise<JobRunPage> {
+    // Empty array filter, return no results
     if (
       (query.status && query.status.length === 0) ||
       (query.gateway && query.gateway.length === 0) ||
       (query.dbInstance && query.dbInstance.length === 0)
     ) {
-      return { items: [], total: 0 };
+      return {
+        items: [],
+        total: 0,
+        counts: { all: 0, success: 0, failed: 0 },
+      };
     }
+
     let results = [...this.data];
 
-    if (query.status?.length) {
-      results = results.filter((r) => query.status!.includes(r.status));
-    }
-
+    // Apply all filters EXCEPT status (for counts)
     if (query.gateway?.length) {
       results = results.filter((r) => query.gateway!.includes(r.gateway));
     }
@@ -97,6 +100,18 @@ export class FakeJobRunRepository implements JobRunRepository {
       );
     }
 
+    // Compute counts BEFORE status filter
+    const counts = {
+      all: results.length,
+      success: results.filter((r) => r.status === "success").length,
+      failed: results.filter((r) => r.status === "failed").length,
+    };
+
+    // Now apply status filter (for items only)
+    if (query.status?.length) {
+      results = results.filter((r) => query.status!.includes(r.status));
+    }
+
     // Sort
     results = sortJobRuns(results, query.sortBy, query.sortDir);
 
@@ -106,6 +121,6 @@ export class FakeJobRunRepository implements JobRunRepository {
     // Paginate
     results = paginate(results, query.offset, query.limit);
 
-    return { items: results, total };
+    return { items: results, total, counts };
   }
 }

@@ -20,12 +20,13 @@ export function jobRunsRouter(repo: JobRunRepository): Router {
     }
 
     try {
-      const { items, total } = await repo.find(parsed.data);
+      const { items, total, counts } = await repo.find(parsed.data);
       return res.json({
         items: items.map(toDto),
         total,
         limit: parsed.data.limit,
         offset: parsed.data.offset,
+        counts,
       });
     } catch (err) {
       console.error("job-runs list failed", err);
