@@ -2,6 +2,9 @@
 
 :root {
   --font-family: "BC Sans", "Noto Sans", "Verdana", "Arial", sans-serif;
+
+  --color-success: #2e8540;
+  --color-failed: #d8292f;
 }
 
 *,

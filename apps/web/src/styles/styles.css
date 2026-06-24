@@ -33,21 +33,21 @@ p.bcds-footer--copyright {
 }
 
 .summary-badge.success {
-  color: #2e8540;
+  color: var(--color-success);
 }
 
 .summary-badge.failed {
-  color: #d8292f;
+  color: var(--color-failed);
 }
 
 .summary-badge.success.active {
-  background-color: #2e8540 !important;
-  border-color: #2e8540 !important;
-  color: #fff !important;
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+  color: #fff;
 }
 
 .summary-badge.failed.active {
-  background-color: #d8292f !important;
-  border-color: #d8292f !important;
-  color: #fff !important;
+  background-color: var(--color-failed);
+  border-color: var(--color-failed);
+  color: #fff;
 }
