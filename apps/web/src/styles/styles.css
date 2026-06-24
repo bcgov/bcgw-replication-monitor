@@ -22,3 +22,32 @@ p.bcds-footer--copyright {
 .footer-links a:hover {
   text-decoration: underline;
 }
+
+.summary-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  button {
+    padding: 10px;
+  }
+}
+
+.summary-badge.success {
+  color: #2e8540;
+}
+
+.summary-badge.failed {
+  color: #d8292f;
+}
+
+.summary-badge.success.active {
+  background-color: #2e8540 !important;
+  border-color: #2e8540 !important;
+  color: #fff !important;
+}
+
+.summary-badge.failed.active {
+  background-color: #d8292f !important;
+  border-color: #d8292f !important;
+  color: #fff !important;
+}
