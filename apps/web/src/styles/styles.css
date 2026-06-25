@@ -34,10 +34,12 @@ p.bcds-footer--copyright {
 
 .summary-badge.success {
   color: var(--color-success);
+  font-family: inherit;
 }
 
 .summary-badge.failed {
   color: var(--color-failed);
+  font-family: inherit;
 }
 
 .summary-badge.success.active {
