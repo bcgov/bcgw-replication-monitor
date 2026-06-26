@@ -34,12 +34,28 @@ describe("GET /api/job-runs", () => {
     expect(res.body.items).toHaveLength(2);
   });
 
-  it("filters by search term", async () => {
+  it("filters by destTable", async () => {
     const res = await request(app).get("/api/job-runs?search=TABLE_A");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
-    expect(res.body.items[0].srcTable).toBe("TABLE_A");
+    expect(res.body.items[0].destTable).toBe("TABLE_A");
+  });
+
+  it("filters by logFilename", async () => {
+    const res = await request(app).get("/api/job-runs?search=fme_table_a");
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toHaveLength(1);
+    expect(res.body.items[0].logFilename).toContain("fme_table_a");
+  });
+
+  it("search no longer matches srcSchema", async () => {
+    // SRC_SCHEMA exists in data but should not match (search only covers destTable + logFilename)
+    const res = await request(app).get("/api/job-runs?search=SRC_SCHEMA");
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toHaveLength(0);
   });
 
   it("filters by single gateway", async () => {

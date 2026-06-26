@@ -160,13 +160,11 @@ export class OracleJobRunRepository implements JobRunRepository {
 
     if (query.search) {
       conditions.push(`
-        (
-          LOWER(SRC_TABLE) LIKE :search OR
-          LOWER(DEST_TABLE) LIKE :search OR
-          LOWER(SRC_SCHEMA) LIKE :search OR
-          LOWER(DEST_SCHEMA) LIKE :search
-        )
-      `);
+    (
+      LOWER(DEST_TABLE) LIKE :search OR
+      LOWER(LOG_FILENAME) LIKE :search
+    )
+  `);
       params.search = `%${query.search.toLowerCase()}%`;
     }
 
@@ -236,6 +234,8 @@ export class OracleJobRunRepository implements JobRunRepository {
       dbInstance: String(
         row.DB_INSTANCE ?? "",
       ).toLowerCase() as JobRun["dbInstance"],
+
+      logFilename: row.LOG_FILENAME ? String(row.LOG_FILENAME) : null,
     };
   }
 

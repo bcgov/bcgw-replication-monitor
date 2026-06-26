@@ -19,7 +19,8 @@ describe("toDto", () => {
       updateType: "full",
       recordsRead: 1000,
       recordsWritten: 1000,
-      dbInstance: "dlv",
+      dbInstance: "prod",
+      logFilename: "fme_table_a_20240115.log",
     };
 
     const dto = toDto(run);
@@ -38,7 +39,8 @@ describe("toDto", () => {
     expect(dto.updateType).toBe("full");
     expect(dto.recordsRead).toBe(1000);
     expect(dto.recordsWritten).toBe(1000);
-    expect(dto.dbInstance).toBe("dlv");
+    expect(dto.dbInstance).toBe("prod");
+    expect(dto.logFilename).toBe("fme_table_a_20240115.log");
   });
 
   it("handles null records correctly", () => {
@@ -57,12 +59,14 @@ describe("toDto", () => {
       updateType: "incremental",
       recordsRead: null,
       recordsWritten: null,
-      dbInstance: "dlv",
+      dbInstance: "prod",
+      logFilename: null,
     };
 
     const dto = toDto(run);
 
     expect(dto.recordsRead).toBeNull();
     expect(dto.recordsWritten).toBeNull();
+    expect(dto.logFilename).toBeNull();
   });
 });

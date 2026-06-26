@@ -24,6 +24,7 @@ const SAMPLE: JobRun[] = [
     recordsRead: 1000,
     recordsWritten: 1000,
     dbInstance: "prod",
+    logFilename: "fme_table_a_20240115.log",
   },
   {
     gateway: "oracle",
@@ -41,6 +42,7 @@ const SAMPLE: JobRun[] = [
     recordsRead: 500,
     recordsWritten: 0,
     dbInstance: "test",
+    logFilename: "oracle_table_b_20240115.log",
   },
 ];
 
@@ -93,10 +95,8 @@ export class FakeJobRunRepository implements JobRunRepository {
       const term = query.search.toLowerCase();
       results = results.filter(
         (r) =>
-          r.srcTable.toLowerCase().includes(term) ||
           r.destTable.toLowerCase().includes(term) ||
-          r.srcSchema.toLowerCase().includes(term) ||
-          r.destSchema.toLowerCase().includes(term),
+          (r.logFilename?.toLowerCase().includes(term) ?? false),
       );
     }
 
