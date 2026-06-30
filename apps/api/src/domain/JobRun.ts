@@ -1,9 +1,4 @@
-export const JOB_RUN_STATUSES = [
-  "success",
-  "failed",
-  "unchanged",
-  "unknown",
-] as const;
+export const JOB_RUN_STATUSES = ["success", "failed", "unknown"] as const;
 export const JOB_RUN_TYPES = ["fme", "oracle", "sdr", "other"] as const;
 export const DB_INSTANCES = ["dlv", "test", "prod"] as const;
 export const SORT_DIRECTIONS = ["asc", "desc"] as const;
