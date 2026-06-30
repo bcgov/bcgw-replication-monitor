@@ -130,10 +130,11 @@ export class OracleJobRunRepository implements JobRunRepository {
     const params: Record<string, string | number> = {};
 
     if (query.status?.length) {
-      const placeholders = query.status.map((_, i) => `:status${i}`);
+      const allDbValues = query.status.flatMap((s) => this.mapStatusToDb(s));
+      const placeholders = allDbValues.map((_, i) => `:status${i}`);
       conditions.push(`LAST_STATUS IN (${placeholders.join(", ")})`);
-      query.status.forEach((s, i) => {
-        params[`status${i}`] = this.mapStatusToDb(s);
+      allDbValues.forEach((v, i) => {
+        params[`status${i}`] = v;
       });
     }
 
@@ -248,7 +249,8 @@ export class OracleJobRunRepository implements JobRunRepository {
     const normalized = raw.toLowerCase();
     if (normalized === "error") return "failed";
     if (normalized === "success") return "success";
-    if (normalized === "unchanged") return "unchanged";
+    //Unchanged is a form of success
+    if (normalized === "unchanged") return "success";
     return "unknown";
   }
 
@@ -257,8 +259,9 @@ export class OracleJobRunRepository implements JobRunRepository {
    *
    * Reverse of mapStatus — used in WHERE clauses.
    */
-  private mapStatusToDb(status: string): string {
-    if (status === "failed") return "ERROR";
-    return status.toUpperCase();
+  private mapStatusToDb(status: string): string[] {
+    if (status === "failed") return ["ERROR"];
+    if (status === "success") return ["SUCCESS", "UNCHANGED"];
+    return [status.toUpperCase()];
   }
 }
