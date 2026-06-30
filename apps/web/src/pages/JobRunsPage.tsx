@@ -22,15 +22,20 @@ interface JobRunsResponse {
 
 export function JobRunsPage() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [search, setSearch] = useState("");
 
   const { data, isLoading, isError } = useQuery<JobRunsResponse>({
-    queryKey: ["job-runs", filters],
+    queryKey: ["job-runs", filters, search],
     queryFn: () => {
       const params = new URLSearchParams();
 
       filters.status.forEach((s) => params.append("status", s));
       filters.gateway.forEach((g) => params.append("gateway", g));
       filters.dbInstance.forEach((d) => params.append("dbInstance", d));
+
+      if (search.trim()) {
+        params.append("search", search.trim());
+      }
 
       return apiFetch(`/job-runs?${params.toString()}`);
     },
