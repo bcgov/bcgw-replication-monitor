@@ -6,6 +6,7 @@ import { AdvancedFilters } from "../components/AdvancedFilters";
 import { JobRunsResults } from "../components/JobRunsResults";
 import { SummaryBar } from "../components/SummaryBar";
 import { DEFAULT_FILTERS } from "../constants/filterDefaults";
+import { useDebounce } from "../hooks/useDebounce";
 import { useState } from "react";
 
 interface JobRunsResponse {
@@ -23,9 +24,10 @@ interface JobRunsResponse {
 export function JobRunsPage() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
 
   const { data, isLoading, isError } = useQuery<JobRunsResponse>({
-    queryKey: ["job-runs", filters, search],
+    queryKey: ["job-runs", filters, debouncedSearch],
     queryFn: () => {
       const params = new URLSearchParams();
 
@@ -33,8 +35,8 @@ export function JobRunsPage() {
       filters.gateway.forEach((g) => params.append("gateway", g));
       filters.dbInstance.forEach((d) => params.append("dbInstance", d));
 
-      if (search.trim()) {
-        params.append("search", search.trim());
+      if (debouncedSearch.trim()) {
+        params.append("search", debouncedSearch.trim());
       }
 
       return apiFetch(`/job-runs?${params.toString()}`);
@@ -57,7 +59,13 @@ export function JobRunsPage() {
           }
         />
 
-        <JobRunsResults data={data} isLoading={isLoading} isError={isError} />
+        <JobRunsResults
+          data={data}
+          isLoading={isLoading}
+          isError={isError}
+          search={search}
+          onSearchChange={setSearch}
+        />
       </section>
     </div>
   );
