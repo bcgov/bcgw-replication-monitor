@@ -23,6 +23,7 @@ export interface JobRunDto {
   recordsRead: number | null;
   recordsWritten: number | null;
   dbInstance: string;
+  logFilename: string | null;
 }
 
 /** Maps a domain JobRun to the API response shape. */
@@ -43,5 +44,6 @@ export function toDto(run: JobRun): JobRunDto {
     recordsRead: run.recordsRead,
     recordsWritten: run.recordsWritten,
     dbInstance: run.dbInstance,
+    logFilename: run.logFilename,
   };
 }

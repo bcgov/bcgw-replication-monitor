@@ -48,4 +48,5 @@ export interface JobRun {
   recordsRead: number | null;
   recordsWritten: number | null;
   dbInstance: DbInstance;
+  logFilename: string | null;
 }

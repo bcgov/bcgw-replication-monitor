@@ -1,20 +1,26 @@
-import { useState } from "react";
 import type { JobRun } from "../types/jobRun";
 
 interface Props {
   data?: {
     items: JobRun[];
     total: number;
+    counts: { all: number; success: number; failed: number };
     limit: number;
     offset: number;
   };
   isLoading: boolean;
   isError: boolean;
+  search: string;
+  onSearchChange: (value: string) => void;
 }
 
-export function JobRunsResults({ data, isLoading, isError }: Props) {
-  const [search, setSearch] = useState("");
-
+export function JobRunsResults({
+  data,
+  isLoading,
+  isError,
+  search,
+  onSearchChange,
+}: Props) {
   const items = data?.items ?? [];
 
   return (
@@ -23,8 +29,8 @@ export function JobRunsResults({ data, isLoading, isError }: Props) {
         <input
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search job ..."
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Search dest table or log filename..."
           style={{ width: "300px" }}
         />
       </div>
@@ -37,8 +43,8 @@ export function JobRunsResults({ data, isLoading, isError }: Props) {
       {items.length > 0 && (
         <ul>
           {items.map((job) => (
-            <li key={job.id}>
-              {job.srcTable} — {job.status}
+            <li key={job.destSchema + job.destTable}>
+              {job.destTable} — {job.status}
             </li>
           ))}
         </ul>
