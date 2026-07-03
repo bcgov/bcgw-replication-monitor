@@ -1,4 +1,6 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { TextField } from "@bcgov/design-system-react-components";
+import { SearchIcon } from "../components/icons/SearchIcon";
 import { apiFetch } from "../api/client";
 import type { JobRun } from "../types/jobRun";
 import { FiltersPanel } from "../components/FiltersPanel";
@@ -51,21 +53,24 @@ export function JobRunsPage() {
       <section style={{ flex: 1, padding: "1rem" }}>
         <AdvancedFilters />
 
-        <SummaryBar
-          counts={data?.counts ?? { all: 0, success: 0, failed: 0 }}
-          selectedStatuses={filters.status}
-          onStatusChange={(statuses) =>
-            setFilters({ ...filters, status: statuses })
-          }
-        />
+        <div className="results-toolbar">
+          <SummaryBar
+            counts={data?.counts ?? { all: 0, success: 0, failed: 0 }}
+            selectedStatuses={filters.status}
+            onStatusChange={(statuses) =>
+              setFilters({ ...filters, status: statuses })
+            }
+          />
 
-        <JobRunsResults
-          data={data}
-          isLoading={isLoading}
-          isError={isError}
-          search={search}
-          onSearchChange={setSearch}
-        />
+          <TextField
+            aria-label="Search"
+            value={search}
+            onChange={setSearch}
+            iconLeft={<SearchIcon />}
+          />
+        </div>
+
+        <JobRunsResults data={data} isLoading={isLoading} isError={isError} />
       </section>
     </div>
   );

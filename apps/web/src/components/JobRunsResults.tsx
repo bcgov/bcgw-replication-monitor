@@ -10,44 +10,57 @@ interface Props {
   };
   isLoading: boolean;
   isError: boolean;
-  search: string;
-  onSearchChange: (value: string) => void;
 }
 
-export function JobRunsResults({
-  data,
-  isLoading,
-  isError,
-  search,
-  onSearchChange,
-}: Props) {
+export function JobRunsResults({ data, isLoading, isError }: Props) {
   const items = data?.items ?? [];
 
   return (
     <div>
-      <div style={{ marginBottom: "1rem" }}>
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search dest table or log filename..."
-          style={{ width: "300px" }}
-        />
-      </div>
-
-      <h2>Job Runs</h2>
+      <h2>Results</h2>
 
       {isLoading && <div>Loading job runs...</div>}
       {isError && <div>Failed to load job runs</div>}
 
       {items.length > 0 && (
-        <ul>
-          {items.map((job) => (
-            <li key={job.destSchema + job.destTable}>
-              {job.destTable} — {job.status}
-            </li>
-          ))}
-        </ul>
+        <table className="job-runs-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Method</th>
+              <th>Src Schema</th>
+              <th>Src Table</th>
+              <th>Dest Schema</th>
+              <th>Dest Table</th>
+              <th>Update Type</th>
+              <th>Records Read</th>
+              <th>Records Written</th>
+              <th>Last Checked</th>
+              <th>Last Converted</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((job) => (
+              <tr key={`${job.destSchema}.${job.destTable}`}>
+                <td>
+                  <span className={`status-badge status-${job.status}`}>
+                    {job.status}
+                  </span>
+                </td>
+                <td>{job.gateway}</td>
+                <td title={job.srcSchema}>{job.srcSchema}</td>
+                <td title={job.srcTable}>{job.srcTable}</td>
+                <td title={job.destSchema}>{job.destSchema}</td>
+                <td title={job.destTable}>{job.destTable}</td>
+                <td>{job.updateType}</td>
+                <td>{job.recordsRead ?? "—"}</td>
+                <td>{job.recordsWritten ?? "—"}</td>
+                <td>{new Date(job.lastChecked).toLocaleString()}</td>
+                <td>{new Date(job.lastConverted).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );

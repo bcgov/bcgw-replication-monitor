@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { JobRunsResults } from "./JobRunsResults";
 import type { JobRun } from "../types/jobRun";
 
@@ -52,30 +51,20 @@ const mockData = {
 };
 
 describe("JobRunsResults", () => {
-  it("renders job runs", () => {
+  it("renders job runs table", () => {
     render(
-      <JobRunsResults
-        data={mockData}
-        isLoading={false}
-        isError={false}
-        search=""
-        onSearchChange={vi.fn()}
-      />,
+      <JobRunsResults data={mockData} isLoading={false} isError={false} />,
     );
 
-    expect(screen.getByText(/TABLE_A/)).toBeInTheDocument();
-    expect(screen.getByText(/TABLE_B/)).toBeInTheDocument();
+    expect(screen.getAllByText("TABLE_A").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("TABLE_B").length).toBeGreaterThan(0);
+    expect(screen.getByText("fme")).toBeInTheDocument();
+    expect(screen.getByText("oracle")).toBeInTheDocument();
   });
 
   it("shows loading state", () => {
     render(
-      <JobRunsResults
-        data={undefined}
-        isLoading={true}
-        isError={false}
-        search=""
-        onSearchChange={vi.fn()}
-      />,
+      <JobRunsResults data={undefined} isLoading={true} isError={false} />,
     );
 
     expect(screen.getByText("Loading job runs...")).toBeInTheDocument();
@@ -83,35 +72,21 @@ describe("JobRunsResults", () => {
 
   it("shows error state", () => {
     render(
-      <JobRunsResults
-        data={undefined}
-        isLoading={false}
-        isError={true}
-        search=""
-        onSearchChange={vi.fn()}
-      />,
+      <JobRunsResults data={undefined} isLoading={false} isError={true} />,
     );
 
     expect(screen.getByText("Failed to load job runs")).toBeInTheDocument();
   });
 
-  it("calls onSearchChange when user types in search box", async () => {
-    const user = userEvent.setup();
-    const onSearchChange = vi.fn();
-
+  it("displays status with badge", () => {
     render(
-      <JobRunsResults
-        data={mockData}
-        isLoading={false}
-        isError={false}
-        search=""
-        onSearchChange={onSearchChange}
-      />,
+      <JobRunsResults data={mockData} isLoading={false} isError={false} />,
     );
 
-    const input = screen.getByPlaceholderText(/search/i);
-    await user.type(input, "T");
+    const successBadge = screen.getByText("success");
+    const failedBadge = screen.getByText("failed");
 
-    expect(onSearchChange).toHaveBeenCalled();
+    expect(successBadge).toHaveClass("status-success");
+    expect(failedBadge).toHaveClass("status-failed");
   });
 });
