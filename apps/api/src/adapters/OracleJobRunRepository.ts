@@ -183,11 +183,15 @@ export class OracleJobRunRepository implements JobRunRepository {
       gateway: "APPLICATION_ACRONYM",
       srcHost: "SRC_HOST",
       srcSchema: "SRC_SCHEMA",
+      srcTable: "SRC_TABLE",
       destSchema: "DEST_SCHEMA",
       destTable: "DEST_TABLE",
+      lastChecked: "LAST_CHECKED",
       lastConverted: "LAST_CONVERTED",
       status: "LAST_STATUS",
       updateType: "UPDATE_TYPE",
+      recordsRead: "RECORDS_READ",
+      recordsWritten: "RECORDS_WRITTEN",
       dbInstance: "DB_INSTANCE",
     };
 
