@@ -27,9 +27,16 @@ export function JobRunsPage() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
+  const [sort, setSort] = useState<{
+    sortBy: string;
+    sortDir: "asc" | "desc";
+  }>({
+    sortBy: "lastChecked",
+    sortDir: "desc",
+  });
 
   const { data, isLoading, isError } = useQuery<JobRunsResponse>({
-    queryKey: ["job-runs", filters, debouncedSearch],
+    queryKey: ["job-runs", filters, debouncedSearch, sort],
     queryFn: () => {
       const params = new URLSearchParams();
 
@@ -40,6 +47,9 @@ export function JobRunsPage() {
       if (debouncedSearch.trim()) {
         params.append("search", debouncedSearch.trim());
       }
+
+      params.append("sortBy", sort.sortBy);
+      params.append("sortDir", sort.sortDir);
 
       return apiFetch(`/job-runs?${params.toString()}`);
     },
@@ -69,8 +79,13 @@ export function JobRunsPage() {
             iconLeft={<SearchIcon />}
           />
         </div>
-
-        <JobRunsResults data={data} isLoading={isLoading} isError={isError} />
+        <JobRunsResults
+          data={data}
+          isLoading={isLoading}
+          isError={isError}
+          sort={sort}
+          onSortChange={setSort}
+        />{" "}
       </section>
     </div>
   );

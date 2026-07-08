@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { JobRunsResults } from "./JobRunsResults";
 import type { JobRun } from "../types/jobRun";
 
@@ -50,10 +50,18 @@ const mockData = {
   offset: 0,
 };
 
+const defaultSort = { sortBy: "lastConverted", sortDir: "desc" as const };
+
 describe("JobRunsResults", () => {
   it("renders job runs table", () => {
     render(
-      <JobRunsResults data={mockData} isLoading={false} isError={false} />,
+      <JobRunsResults
+        data={mockData}
+        isLoading={false}
+        isError={false}
+        sort={defaultSort}
+        onSortChange={vi.fn()}
+      />,
     );
 
     expect(screen.getAllByText("TABLE_A").length).toBeGreaterThan(0);
@@ -64,7 +72,13 @@ describe("JobRunsResults", () => {
 
   it("shows loading state", () => {
     render(
-      <JobRunsResults data={undefined} isLoading={true} isError={false} />,
+      <JobRunsResults
+        data={undefined}
+        isLoading={true}
+        isError={false}
+        sort={defaultSort}
+        onSortChange={vi.fn()}
+      />,
     );
 
     expect(screen.getByText("Loading job runs...")).toBeInTheDocument();
@@ -72,7 +86,13 @@ describe("JobRunsResults", () => {
 
   it("shows error state", () => {
     render(
-      <JobRunsResults data={undefined} isLoading={false} isError={true} />,
+      <JobRunsResults
+        data={undefined}
+        isLoading={false}
+        isError={true}
+        sort={defaultSort}
+        onSortChange={vi.fn()}
+      />,
     );
 
     expect(screen.getByText("Failed to load job runs")).toBeInTheDocument();
@@ -80,7 +100,13 @@ describe("JobRunsResults", () => {
 
   it("displays status with badge", () => {
     render(
-      <JobRunsResults data={mockData} isLoading={false} isError={false} />,
+      <JobRunsResults
+        data={mockData}
+        isLoading={false}
+        isError={false}
+        sort={defaultSort}
+        onSortChange={vi.fn()}
+      />,
     );
 
     const successBadge = screen.getByText("success");

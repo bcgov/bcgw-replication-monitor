@@ -10,10 +10,36 @@ interface Props {
   };
   isLoading: boolean;
   isError: boolean;
+  sort: { sortBy: string; sortDir: "asc" | "desc" };
+  onSortChange: (sort: { sortBy: string; sortDir: "asc" | "desc" }) => void;
 }
 
-export function JobRunsResults({ data, isLoading, isError }: Props) {
+export function JobRunsResults({
+  data,
+  isLoading,
+  isError,
+  sort,
+  onSortChange,
+}: Props) {
   const items = data?.items ?? [];
+
+  const handleSort = (field: string) => {
+    if (sort.sortBy === field) {
+      // Toggle direction
+      onSortChange({
+        sortBy: field,
+        sortDir: sort.sortDir === "asc" ? "desc" : "asc",
+      });
+    } else {
+      // New column, default to asc
+      onSortChange({ sortBy: field, sortDir: "asc" });
+    }
+  };
+
+  const renderSortIcon = (field: string) => {
+    if (sort.sortBy !== field) return null;
+    return sort.sortDir === "asc" ? " ↑" : " ↓";
+  };
 
   return (
     <div>
@@ -24,19 +50,67 @@ export function JobRunsResults({ data, isLoading, isError }: Props) {
 
       {items.length > 0 && (
         <table className="job-runs-table">
+          <colgroup>
+            <col style={{ width: "6rem" }} /> {/* Status */}
+            <col style={{ width: "5rem" }} /> {/* Method */}
+            <col /> {/* Src Schema */}
+            <col /> {/* Src Table */}
+            <col /> {/* Dest Schema */}
+            <col /> {/* Dest Table */}
+            <col style={{ width: "7rem" }} /> {/* Update Type */}
+            <col style={{ width: "8rem" }} /> {/* Records Read */}
+            <col style={{ width: "8rem" }} /> {/* Records Written */}
+            <col style={{ width: "9%" }} /> {/* Last Checked */}
+            <col style={{ width: "9%" }} /> {/* Last Converted */}
+          </colgroup>
+
           <thead>
             <tr>
-              <th>Status</th>
-              <th>Method</th>
-              <th>Src Schema</th>
-              <th>Src Table</th>
-              <th>Dest Schema</th>
-              <th>Dest Table</th>
-              <th>Update Type</th>
-              <th>Records Read</th>
-              <th>Records Written</th>
-              <th>Last Checked</th>
-              <th>Last Converted</th>
+              <th onClick={() => handleSort("status")} className="sortable">
+                Status{renderSortIcon("status")}
+              </th>
+              <th onClick={() => handleSort("gateway")} className="sortable">
+                Method{renderSortIcon("gateway")}
+              </th>
+              <th onClick={() => handleSort("srcSchema")} className="sortable">
+                Src Schema{renderSortIcon("srcSchema")}
+              </th>
+              <th onClick={() => handleSort("srcTable")} className="sortable">
+                Src Table{renderSortIcon("srcTable")}
+              </th>
+              <th onClick={() => handleSort("destSchema")} className="sortable">
+                Dest Schema{renderSortIcon("destSchema")}
+              </th>
+              <th onClick={() => handleSort("destTable")} className="sortable">
+                Dest Table{renderSortIcon("destTable")}
+              </th>
+              <th onClick={() => handleSort("updateType")} className="sortable">
+                Update Type{renderSortIcon("updateType")}
+              </th>
+              <th
+                onClick={() => handleSort("recordsRead")}
+                className="sortable"
+              >
+                Records Read{renderSortIcon("recordsRead")}
+              </th>
+              <th
+                onClick={() => handleSort("recordsWritten")}
+                className="sortable"
+              >
+                Records Written{renderSortIcon("recordsWritten")}
+              </th>
+              <th
+                onClick={() => handleSort("lastChecked")}
+                className="sortable"
+              >
+                Last Checked{renderSortIcon("lastChecked")}
+              </th>
+              <th
+                onClick={() => handleSort("lastConverted")}
+                className="sortable"
+              >
+                Last Converted{renderSortIcon("lastConverted")}
+              </th>
             </tr>
           </thead>
           <tbody>
