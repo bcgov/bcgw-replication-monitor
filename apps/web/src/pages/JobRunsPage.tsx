@@ -60,9 +60,8 @@ export function JobRunsPage() {
     <div style={{ display: "flex", gap: "1rem" }}>
       <FiltersPanel filters={filters} onChange={setFilters} />
 
-      <section style={{ flex: 1, padding: "1rem" }}>
+      <section style={{ flex: 1, padding: "0.5rem" }}>
         <AdvancedFilters />
-
         <div className="results-toolbar">
           <SummaryBar
             counts={data?.counts ?? { all: 0, success: 0, failed: 0 }}
