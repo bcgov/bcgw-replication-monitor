@@ -50,7 +50,7 @@ const mockData = {
   offset: 0,
 };
 
-const defaultSort = { sortBy: "lastConverted", sortDir: "desc" as const };
+const defaultSort = { sortBy: "lastChecked", sortDir: "desc" as const };
 
 describe("JobRunsResults", () => {
   it("renders job runs table", () => {
