@@ -1,8 +1,12 @@
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { JobRunsResults } from "./JobRunsResults";
 import type { JobRun } from "../types/jobRun";
+
+const renderWithRouter = (ui: React.ReactElement) =>
+  render(<MemoryRouter>{ui}</MemoryRouter>);
 
 const mockItems: JobRun[] = [
   {
@@ -51,30 +55,34 @@ const mockData = {
   offset: 0,
 };
 
+const defaultSort = { sortBy: "lastChecked", sortDir: "desc" as const };
+
 describe("JobRunsResults", () => {
-  it("renders job runs", () => {
-    render(
+  it("renders job runs table", () => {
+    renderWithRouter(
       <JobRunsResults
         data={mockData}
         isLoading={false}
         isError={false}
-        search=""
-        onSearchChange={vi.fn()}
+        sort={defaultSort}
+        onSortChange={vi.fn()}
       />,
     );
 
-    expect(screen.getByText(/TABLE_A/)).toBeInTheDocument();
-    expect(screen.getByText(/TABLE_B/)).toBeInTheDocument();
+    expect(screen.getAllByText("TABLE_A").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("TABLE_B").length).toBeGreaterThan(0);
+    expect(screen.getByText("fme")).toBeInTheDocument();
+    expect(screen.getByText("oracle")).toBeInTheDocument();
   });
 
   it("shows loading state", () => {
-    render(
+    renderWithRouter(
       <JobRunsResults
         data={undefined}
         isLoading={true}
         isError={false}
-        search=""
-        onSearchChange={vi.fn()}
+        sort={defaultSort}
+        onSortChange={vi.fn()}
       />,
     );
 
@@ -82,36 +90,64 @@ describe("JobRunsResults", () => {
   });
 
   it("shows error state", () => {
-    render(
+    renderWithRouter(
       <JobRunsResults
         data={undefined}
         isLoading={false}
         isError={true}
-        search=""
-        onSearchChange={vi.fn()}
+        sort={defaultSort}
+        onSortChange={vi.fn()}
       />,
     );
 
     expect(screen.getByText("Failed to load job runs")).toBeInTheDocument();
   });
 
-  it("calls onSearchChange when user types in search box", async () => {
-    const user = userEvent.setup();
-    const onSearchChange = vi.fn();
-
-    render(
+  it("displays status with badge", () => {
+    renderWithRouter(
       <JobRunsResults
         data={mockData}
         isLoading={false}
         isError={false}
-        search=""
-        onSearchChange={onSearchChange}
+        sort={defaultSort}
+        onSortChange={vi.fn()}
       />,
     );
 
-    const input = screen.getByPlaceholderText(/search/i);
-    await user.type(input, "T");
+    const successBadge = screen.getByText("success");
+    const failedBadge = screen.getByText("failed");
 
-    expect(onSearchChange).toHaveBeenCalled();
+    expect(successBadge).toHaveClass("status-success");
+    expect(failedBadge).toHaveClass("status-failed");
+  });
+
+  it("navigates to history page on row click", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <JobRunsResults
+                data={mockData}
+                isLoading={false}
+                isError={false}
+                sort={defaultSort}
+                onSortChange={vi.fn()}
+              />
+            }
+          />
+          <Route path="/history/:jobId" element={<div>History Page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    // Click the first data row
+    const firstRow = screen.getByText("fme").closest("tr");
+    await user.click(firstRow!);
+
+    expect(screen.getByText("History Page")).toBeInTheDocument();
   });
 });

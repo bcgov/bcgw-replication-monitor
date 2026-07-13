@@ -8,19 +8,48 @@
   color: rgb(70, 67, 65);
   text-decoration: underline;
   font-size: 14px;
+  a {
+    color: inherit;
+    text-decoration: inherit;
+    :hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 p.bcds-footer--copyright {
   font-size: 14px !important;
 }
 
-.footer-links a {
-  color: inherit;
-  text-decoration: inherit;
+.results-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-.footer-links a:hover {
-  text-decoration: underline;
+.results-search {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 250px;
+}
+
+.filters-panel {
+  width: 250px;
+  flex-shrink: 0;
+  border-right: 1px solid #ddd;
+  padding: 1rem;
+}
+
+.filter-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  span {
+    font-weight: bold;
+  }
 }
 
 .summary-bar {
@@ -32,24 +61,112 @@ p.bcds-footer--copyright {
   }
 }
 
+.summary-badge {
+  cursor: pointer;
+  border-radius: 4px;
+  background-color: white;
+  font-family: inherit;
+  border: 1px solid;
+}
+
 .summary-badge.success {
   color: var(--color-success);
-  font-family: inherit;
+  border-color: var(--color-success);
 }
 
 .summary-badge.failed {
   color: var(--color-failed);
-  font-family: inherit;
+  border-color: var(--color-failed);
 }
 
 .summary-badge.success.active {
   background-color: var(--color-success);
-  border-color: var(--color-success);
-  color: #fff;
+  color: white;
 }
 
 .summary-badge.failed.active {
   background-color: var(--color-failed);
-  border-color: var(--color-failed);
-  color: #fff;
+  color: white;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  width: 100%;
+  min-width: 75rem;
+}
+
+.job-runs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  table-layout: fixed;
+
+  th {
+    background: #f5f5f5;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  th,
+  td {
+    padding: 0.5rem 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th.sortable {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  th.sortable:hover {
+    background: #eee;
+  }
+
+  tbody tr {
+    cursor: pointer;
+  }
+
+  tbody tr:hover {
+    background: #f9f9f9;
+  }
+}
+
+.status-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: white;
+}
+
+.status-badge.status-success {
+  background: var(--color-success);
+}
+
+.status-badge.status-failed {
+  background: var(--color-failed);
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pagination-page {
+  color: #666;
 }

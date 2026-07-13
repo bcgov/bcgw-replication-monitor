@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { JobHistoryPage } from "./pages/JobHistoryPage";
 import { AppLayout } from "./layouts/AppLayout";
 import { JobRunsPage } from "./pages/JobRunsPage";
 
@@ -13,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route index element={<JobRunsPage />} />
+          <Route path="history/:jobId" element={<JobHistoryPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

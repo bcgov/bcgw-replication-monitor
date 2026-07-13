@@ -6,11 +6,15 @@ export const JOB_RUN_SORT_FIELDS = [
   "gateway",
   "srcHost",
   "srcSchema",
+  "srcTable",
   "destSchema",
   "destTable",
+  "lastChecked",
   "lastConverted",
   "status",
   "updateType",
+  "recordsRead",
+  "recordsWritten",
   "dbInstance",
 ] as const;
 

@@ -26,18 +26,10 @@ interface Props {
  */
 export function FiltersPanel({ filters, onChange }: Props) {
   return (
-    <aside
-      style={{
-        width: "250px",
-        borderRight: "1px solid #ddd",
-        padding: "1rem",
-      }}
-    >
+    <aside className="filters-panel">
       <AccordionGroup defaultExpandedKeys={["jobs"]}>
         <Accordion id="jobs" label="Jobs">
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-          >
+          <div className="filter-groups">
             <CheckboxGroup
               label="Method"
               value={filters.gateway}
@@ -80,7 +72,6 @@ export function FiltersPanel({ filters, onChange }: Props) {
               variant="secondary"
               size="small"
               onPress={() => onChange(DEFAULT_FILTERS)}
-              style={{ marginTop: "1rem" }}
             >
               Reset Filters
             </Button>

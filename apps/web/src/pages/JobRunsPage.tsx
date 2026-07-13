@@ -1,13 +1,16 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { TextField } from "@bcgov/design-system-react-components";
+import { SearchIcon } from "../components/icons/SearchIcon";
 import { apiFetch } from "../api/client";
 import type { JobRun } from "../types/jobRun";
 import { FiltersPanel } from "../components/FiltersPanel";
 import { AdvancedFilters } from "../components/AdvancedFilters";
 import { JobRunsResults } from "../components/JobRunsResults";
 import { SummaryBar } from "../components/SummaryBar";
-import { DEFAULT_FILTERS } from "../constants/filterDefaults";
+import { Pagination } from "../components/Pagination";
+import { useReducer } from "react";
+import { jobRunsQueryReducer, initialQueryState } from "./jobRunsQueryReducer";
 import { useDebounce } from "../hooks/useDebounce";
-import { useState } from "react";
 
 interface JobRunsResponse {
   items: JobRun[];
@@ -22,22 +25,38 @@ interface JobRunsResponse {
 }
 
 export function JobRunsPage() {
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
-  const [search, setSearch] = useState("");
+  const [query, dispatch] = useReducer(jobRunsQueryReducer, initialQueryState);
+  const { filters, search, sort, page } = query;
   const debouncedSearch = useDebounce(search, 300);
 
+  const pageSize = 20;
+
   const { data, isLoading, isError } = useQuery<JobRunsResponse>({
-    queryKey: ["job-runs", filters, debouncedSearch],
+    queryKey: ["job-runs", filters, debouncedSearch, sort, page],
     queryFn: () => {
       const params = new URLSearchParams();
+      const appendArrayParam = (key: string, values: string[]) => {
+        if (values.length === 0) {
+          params.append(key, ""); // If empty, backend returns none
+        } else {
+          values.forEach((v) => params.append(key, v));
+        }
+      };
 
-      filters.status.forEach((s) => params.append("status", s));
-      filters.gateway.forEach((g) => params.append("gateway", g));
-      filters.dbInstance.forEach((d) => params.append("dbInstance", d));
+      appendArrayParam("status", filters.status);
+      appendArrayParam("gateway", filters.gateway);
+      appendArrayParam("dbInstance", filters.dbInstance);
 
       if (debouncedSearch.trim()) {
         params.append("search", debouncedSearch.trim());
       }
+
+      params.append("sortBy", sort.sortBy);
+      params.append("sortDir", sort.sortDir);
+
+      //Pagination
+      params.append("limit", String(pageSize));
+      params.append("offset", String(page * pageSize));
 
       return apiFetch(`/job-runs?${params.toString()}`);
     },
@@ -46,25 +65,47 @@ export function JobRunsPage() {
 
   return (
     <div style={{ display: "flex", gap: "1rem" }}>
-      <FiltersPanel filters={filters} onChange={setFilters} />
+      <FiltersPanel
+        filters={filters}
+        onChange={(f) => dispatch({ type: "SET_FILTERS", payload: f })}
+      />
 
-      <section style={{ flex: 1, padding: "1rem" }}>
+      <section style={{ flex: 1, padding: "0.5rem" }}>
         <AdvancedFilters />
+        <div className="results-toolbar">
+          <SummaryBar
+            counts={data?.counts ?? { all: 0, success: 0, failed: 0 }}
+            selectedStatuses={filters.status}
+            onStatusChange={(statuses) =>
+              dispatch({
+                type: "SET_FILTERS",
+                payload: { ...filters, status: statuses },
+              })
+            }
+          />
 
-        <SummaryBar
-          counts={data?.counts ?? { all: 0, success: 0, failed: 0 }}
-          selectedStatuses={filters.status}
-          onStatusChange={(statuses) =>
-            setFilters({ ...filters, status: statuses })
-          }
-        />
-
+          <TextField
+            aria-label="Search"
+            value={search}
+            onChange={(value) =>
+              dispatch({ type: "SET_SEARCH", payload: value })
+            }
+            iconLeft={<SearchIcon />}
+          />
+        </div>
         <JobRunsResults
           data={data}
           isLoading={isLoading}
           isError={isError}
-          search={search}
-          onSearchChange={setSearch}
+          sort={sort}
+          onSortChange={(s) => dispatch({ type: "SET_SORT", payload: s })}
+        />
+
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={data?.total ?? 0}
+          onPageChange={(p) => dispatch({ type: "SET_PAGE", payload: p })}
         />
       </section>
     </div>
