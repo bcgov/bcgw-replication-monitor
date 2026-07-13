@@ -1,4 +1,5 @@
 import type { JobRun } from "../types/jobRun";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   data?: {
@@ -21,6 +22,8 @@ export function JobRunsResults({
   sort,
   onSortChange,
 }: Props) {
+  const navigate = useNavigate();
+
   const items = data?.items ?? [];
 
   const handleSort = (field: string) => {
@@ -128,7 +131,14 @@ export function JobRunsResults({
             </thead>
             <tbody>
               {items.map((job) => (
-                <tr key={`${job.destSchema}.${job.destTable}`}>
+                <tr
+                  key={`${job.destSchema}.${job.destTable}`}
+                  onClick={() =>
+                    navigate(
+                      `/history/${encodeURIComponent(`${job.destSchema}.${job.destTable}`)}`,
+                    )
+                  }
+                >
                   <td>
                     <span className={`status-badge status-${job.status}`}>
                       {job.status}

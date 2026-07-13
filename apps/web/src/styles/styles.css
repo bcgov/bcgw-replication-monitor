@@ -129,6 +129,10 @@ p.bcds-footer--copyright {
     background: #eee;
   }
 
+  tbody tr {
+    cursor: pointer;
+  }
+
   tbody tr:hover {
     background: #f9f9f9;
   }

@@ -1,7 +1,12 @@
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { JobRunsResults } from "./JobRunsResults";
 import type { JobRun } from "../types/jobRun";
+
+const renderWithRouter = (ui: React.ReactElement) =>
+  render(<MemoryRouter>{ui}</MemoryRouter>);
 
 const mockItems: JobRun[] = [
   {
@@ -54,7 +59,7 @@ const defaultSort = { sortBy: "lastChecked", sortDir: "desc" as const };
 
 describe("JobRunsResults", () => {
   it("renders job runs table", () => {
-    render(
+    renderWithRouter(
       <JobRunsResults
         data={mockData}
         isLoading={false}
@@ -71,7 +76,7 @@ describe("JobRunsResults", () => {
   });
 
   it("shows loading state", () => {
-    render(
+    renderWithRouter(
       <JobRunsResults
         data={undefined}
         isLoading={true}
@@ -85,7 +90,7 @@ describe("JobRunsResults", () => {
   });
 
   it("shows error state", () => {
-    render(
+    renderWithRouter(
       <JobRunsResults
         data={undefined}
         isLoading={false}
@@ -99,7 +104,7 @@ describe("JobRunsResults", () => {
   });
 
   it("displays status with badge", () => {
-    render(
+    renderWithRouter(
       <JobRunsResults
         data={mockData}
         isLoading={false}
@@ -114,5 +119,35 @@ describe("JobRunsResults", () => {
 
     expect(successBadge).toHaveClass("status-success");
     expect(failedBadge).toHaveClass("status-failed");
+  });
+
+  it("navigates to history page on row click", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <JobRunsResults
+                data={mockData}
+                isLoading={false}
+                isError={false}
+                sort={defaultSort}
+                onSortChange={vi.fn()}
+              />
+            }
+          />
+          <Route path="/history/:jobId" element={<div>History Page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    // Click the first data row
+    const firstRow = screen.getByText("fme").closest("tr");
+    await user.click(firstRow!);
+
+    expect(screen.getByText("History Page")).toBeInTheDocument();
   });
 });
