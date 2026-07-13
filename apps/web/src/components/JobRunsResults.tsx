@@ -49,92 +49,106 @@ export function JobRunsResults({
       {isError && <div>Failed to load job runs</div>}
 
       {items.length > 0 && (
-        <table className="job-runs-table">
-          <colgroup>
-            <col style={{ width: "6rem" }} /> {/* Status */}
-            <col style={{ width: "5rem" }} /> {/* Method */}
-            <col /> {/* Src Schema */}
-            <col /> {/* Src Table */}
-            <col /> {/* Dest Schema */}
-            <col /> {/* Dest Table */}
-            <col style={{ width: "7rem" }} /> {/* Update Type */}
-            <col style={{ width: "8rem" }} /> {/* Records Read */}
-            <col style={{ width: "8rem" }} /> {/* Records Written */}
-            <col style={{ width: "9%" }} /> {/* Last Checked */}
-            <col style={{ width: "9%" }} /> {/* Last Converted */}
-          </colgroup>
+        <div className="table-scroll">
+          <table className="job-runs-table">
+            <colgroup>
+              <col style={{ width: "6rem" }} /> {/* Status */}
+              <col style={{ width: "5rem" }} /> {/* Method */}
+              <col /> {/* Src Schema */}
+              <col /> {/* Src Table */}
+              <col /> {/* Dest Schema */}
+              <col /> {/* Dest Table */}
+              <col style={{ width: "7rem" }} /> {/* Update Type */}
+              <col style={{ width: "8rem" }} /> {/* Records Read */}
+              <col style={{ width: "8rem" }} /> {/* Records Written */}
+              <col style={{ width: "9%" }} /> {/* Last Checked */}
+              <col style={{ width: "11%" }} /> {/* Last Converted */}
+            </colgroup>
 
-          <thead>
-            <tr>
-              <th onClick={() => handleSort("status")} className="sortable">
-                Status{renderSortIcon("status")}
-              </th>
-              <th onClick={() => handleSort("gateway")} className="sortable">
-                Method{renderSortIcon("gateway")}
-              </th>
-              <th onClick={() => handleSort("srcSchema")} className="sortable">
-                Src Schema{renderSortIcon("srcSchema")}
-              </th>
-              <th onClick={() => handleSort("srcTable")} className="sortable">
-                Src Table{renderSortIcon("srcTable")}
-              </th>
-              <th onClick={() => handleSort("destSchema")} className="sortable">
-                Dest Schema{renderSortIcon("destSchema")}
-              </th>
-              <th onClick={() => handleSort("destTable")} className="sortable">
-                Dest Table{renderSortIcon("destTable")}
-              </th>
-              <th onClick={() => handleSort("updateType")} className="sortable">
-                Update Type{renderSortIcon("updateType")}
-              </th>
-              <th
-                onClick={() => handleSort("recordsRead")}
-                className="sortable"
-              >
-                Records Read{renderSortIcon("recordsRead")}
-              </th>
-              <th
-                onClick={() => handleSort("recordsWritten")}
-                className="sortable"
-              >
-                Records Written{renderSortIcon("recordsWritten")}
-              </th>
-              <th
-                onClick={() => handleSort("lastChecked")}
-                className="sortable"
-              >
-                Last Checked{renderSortIcon("lastChecked")}
-              </th>
-              <th
-                onClick={() => handleSort("lastConverted")}
-                className="sortable"
-              >
-                Last Converted{renderSortIcon("lastConverted")}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((job) => (
-              <tr key={`${job.destSchema}.${job.destTable}`}>
-                <td>
-                  <span className={`status-badge status-${job.status}`}>
-                    {job.status}
-                  </span>
-                </td>
-                <td>{job.gateway}</td>
-                <td title={job.srcSchema}>{job.srcSchema}</td>
-                <td title={job.srcTable}>{job.srcTable}</td>
-                <td title={job.destSchema}>{job.destSchema}</td>
-                <td title={job.destTable}>{job.destTable}</td>
-                <td>{job.updateType}</td>
-                <td>{job.recordsRead ?? "—"}</td>
-                <td>{job.recordsWritten ?? "—"}</td>
-                <td>{new Date(job.lastChecked).toLocaleString()}</td>
-                <td>{new Date(job.lastConverted).toLocaleString()}</td>
+            <thead>
+              <tr>
+                <th onClick={() => handleSort("status")} className="sortable">
+                  Status{renderSortIcon("status")}
+                </th>
+                <th onClick={() => handleSort("gateway")} className="sortable">
+                  Method{renderSortIcon("gateway")}
+                </th>
+                <th
+                  onClick={() => handleSort("srcSchema")}
+                  className="sortable"
+                >
+                  Src Schema{renderSortIcon("srcSchema")}
+                </th>
+                <th onClick={() => handleSort("srcTable")} className="sortable">
+                  Src Table{renderSortIcon("srcTable")}
+                </th>
+                <th
+                  onClick={() => handleSort("destSchema")}
+                  className="sortable"
+                >
+                  Dest Schema{renderSortIcon("destSchema")}
+                </th>
+                <th
+                  onClick={() => handleSort("destTable")}
+                  className="sortable"
+                >
+                  Dest Table{renderSortIcon("destTable")}
+                </th>
+                <th
+                  onClick={() => handleSort("updateType")}
+                  className="sortable"
+                >
+                  Update Type{renderSortIcon("updateType")}
+                </th>
+                <th
+                  onClick={() => handleSort("recordsRead")}
+                  className="sortable"
+                >
+                  Records Read{renderSortIcon("recordsRead")}
+                </th>
+                <th
+                  onClick={() => handleSort("recordsWritten")}
+                  className="sortable"
+                >
+                  Records Written{renderSortIcon("recordsWritten")}
+                </th>
+                <th
+                  onClick={() => handleSort("lastChecked")}
+                  className="sortable"
+                >
+                  Last Checked{renderSortIcon("lastChecked")}
+                </th>
+                <th
+                  onClick={() => handleSort("lastConverted")}
+                  className="sortable"
+                >
+                  Last Converted{renderSortIcon("lastConverted")}
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.map((job) => (
+                <tr key={`${job.destSchema}.${job.destTable}`}>
+                  <td>
+                    <span className={`status-badge status-${job.status}`}>
+                      {job.status}
+                    </span>
+                  </td>
+                  <td>{job.gateway}</td>
+                  <td title={job.srcSchema}>{job.srcSchema}</td>
+                  <td title={job.srcTable}>{job.srcTable}</td>
+                  <td title={job.destSchema}>{job.destSchema}</td>
+                  <td title={job.destTable}>{job.destTable}</td>
+                  <td>{job.updateType}</td>
+                  <td>{job.recordsRead ?? "—"}</td>
+                  <td>{job.recordsWritten ?? "—"}</td>
+                  <td>{new Date(job.lastChecked).toLocaleString()}</td>
+                  <td>{new Date(job.lastConverted).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

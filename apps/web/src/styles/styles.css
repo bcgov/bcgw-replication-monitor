@@ -89,6 +89,12 @@ p.bcds-footer--copyright {
   color: white;
 }
 
+.table-scroll {
+  overflow-x: auto;
+  width: 100%;
+  min-width: 75rem;
+}
+
 .job-runs-table {
   width: 100%;
   border-collapse: collapse;
@@ -141,4 +147,22 @@ p.bcds-footer--copyright {
 
 .status-badge.status-failed {
   background: var(--color-failed);
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pagination-page {
+  color: #666;
 }
