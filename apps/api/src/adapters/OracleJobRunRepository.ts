@@ -108,6 +108,36 @@ export class OracleJobRunRepository implements JobRunRepository {
   }
 
   /**
+   * Returns the distinct destination schemas from the view, sorted.
+   *
+   * Runs a lightweight DISTINCT query to populate
+   * the advanced filter's schema dropdown. Kept in sync with actual data
+   */
+  async listSchemas(): Promise<string[]> {
+    const connection = await this.pool.getConnection();
+
+    try {
+      const sql = `
+      SELECT DISTINCT DEST_SCHEMA
+      FROM ${this.view}
+      WHERE DEST_SCHEMA IS NOT NULL
+      ORDER BY DEST_SCHEMA
+    `;
+
+      const result = await connection.execute<{ DEST_SCHEMA: string }>(
+        sql,
+        {},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+      );
+
+      return (result.rows ?? []).map((row) => row.DEST_SCHEMA);
+    } finally {
+      // Always release the connection back to the pool
+      await connection.close();
+    }
+  }
+
+  /**
    * Build WHERE clause dynamically
    */
   private buildWhere(query: JobRunQuery): {

@@ -6,6 +6,9 @@ import { FakeJobRunRepository } from "../adapters/FakeJobRunRepository";
 const repo = new FakeJobRunRepository();
 const app = createApp(repo);
 
+/*
+ * Test suite for job runs API
+ */
 describe("GET /api/job-runs", () => {
   it("returns all job runs with pagination metadata", async () => {
     const res = await request(app).get("/api/job-runs");
@@ -222,5 +225,32 @@ describe("GET /api/job-runs", () => {
     expect(res.body.counts.all).toBe(1);
     expect(res.body.counts.success).toBe(1);
     expect(res.body.counts.failed).toBe(0);
+  });
+});
+
+/*
+ * Test suite for schemas API
+ */
+describe("GET /api/schemas", () => {
+  it("returns distinct schemas", async () => {
+    const res = await request(app).get("/api/schemas");
+
+    expect(res.status).toBe(200);
+    expect(res.body.schemas).toBeDefined();
+    expect(Array.isArray(res.body.schemas)).toBe(true);
+  });
+
+  it("returns schemas sorted alphabetically", async () => {
+    const res = await request(app).get("/api/schemas");
+
+    const schemas = res.body.schemas;
+    expect(schemas).toEqual([...schemas].sort());
+  });
+
+  it("returns no duplicate schemas", async () => {
+    const res = await request(app).get("/api/schemas");
+
+    const schemas = res.body.schemas;
+    expect(schemas.length).toBe(new Set(schemas).size);
   });
 });

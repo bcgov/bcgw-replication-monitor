@@ -15,7 +15,7 @@ const SAMPLE: JobRun[] = [
     srcSchema: "SRC_SCHEMA",
     srcTable: "TABLE_A",
     destHost: "dest-host-1",
-    destSchema: "DEST_SCHEMA",
+    destSchema: "DEST_SCHEMA_A",
     destTable: "TABLE_A",
     lastChecked: new Date("2024-01-15T10:00:00Z"),
     lastConverted: new Date("2024-01-15T09:55:00Z"),
@@ -33,7 +33,7 @@ const SAMPLE: JobRun[] = [
     srcSchema: "SRC_SCHEMA",
     srcTable: "TABLE_B",
     destHost: "dest-host-1",
-    destSchema: "DEST_SCHEMA",
+    destSchema: "DEST_SCHEMA_B",
     destTable: "TABLE_B",
     lastChecked: new Date("2024-01-15T10:05:00Z"),
     lastConverted: new Date("2024-01-15T09:50:00Z"),
@@ -122,5 +122,17 @@ export class FakeJobRunRepository implements JobRunRepository {
     results = paginate(results, query.offset, query.limit);
 
     return { items: results, total, counts };
+  }
+
+  /**
+   * Returns the distinct destination schemas from the in-memory data.
+   *
+   * Mirrors the Oracle adapter's DISTINCT query so the schema dropdown
+   * behaves the same in dev/test (fake) and production (Oracle).
+   */
+  async listSchemas(): Promise<string[]> {
+    // Set removes duplicates, then sort alphabetically for a stable dropdown order
+    const schemas = new Set(this.data.map((r) => r.destSchema));
+    return Array.from(schemas).sort();
   }
 }

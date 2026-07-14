@@ -8,4 +8,10 @@ import { JobRunQuery } from "../domain/JobRunQuery";
  */
 export interface JobRunRepository {
   find(query: JobRunQuery): Promise<JobRunPage>;
+
+  /**
+   * Returns the distinct destination schemas, sorted alphabetically.
+   * Used to populate the advanced filter's schema dropdown.
+   */
+  listSchemas(): Promise<string[]>;
 }
