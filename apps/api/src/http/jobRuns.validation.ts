@@ -11,10 +11,10 @@ import {
  * Normalises a query param into an array.
  *
  * Handles:
- * - undefined → undefined
- * - single value → [value]
- * - comma-separated → [value1, value2]
- * - already an array → as is
+ * - undefined to undefined
+ * - single value to [value]
+ * - comma-separated to [value1, value2]
+ * - already an array to as is
  */
 const toArray = <T extends z.ZodTypeAny>(inner: T) =>
   z.preprocess((v) => {

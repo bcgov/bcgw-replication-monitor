@@ -85,9 +85,9 @@ export class FakeJobRunRepository implements JobRunRepository {
     }
 
     if (query.destSchema) {
-      const term = query.destSchema.toLowerCase();
+      const term = query.destSchema.toUpperCase();
       results = results.filter((r) =>
-        r.destSchema.toLowerCase().includes(term),
+        r.destSchema.toUpperCase().includes(term),
       );
     }
 
@@ -132,7 +132,8 @@ export class FakeJobRunRepository implements JobRunRepository {
    */
   async listSchemas(): Promise<string[]> {
     // Set removes duplicates, then sort alphabetically for a stable dropdown order
-    const schemas = new Set(this.data.map((r) => r.destSchema));
+    // UPPER-case then dedupe to collapse case variants (matches Oracle)
+    const schemas = new Set(this.data.map((r) => r.destSchema.toUpperCase()));
     return Array.from(schemas).sort();
   }
 }

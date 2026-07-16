@@ -117,11 +117,12 @@ export class OracleJobRunRepository implements JobRunRepository {
     const connection = await this.pool.getConnection();
 
     try {
+      // UPPER collapses case variants into one; DISTINCT then dedupes.
       const sql = `
-      SELECT DISTINCT DEST_SCHEMA
+      SELECT DISTINCT UPPER(DEST_SCHEMA) AS DEST_SCHEMA
       FROM ${this.view}
       WHERE DEST_SCHEMA IS NOT NULL
-      ORDER BY DEST_SCHEMA
+      ORDER BY UPPER(DEST_SCHEMA)
     `;
 
       const result = await connection.execute<{ DEST_SCHEMA: string }>(
@@ -185,8 +186,8 @@ export class OracleJobRunRepository implements JobRunRepository {
     }
 
     if (query.destSchema) {
-      conditions.push("LOWER(DEST_SCHEMA) LIKE :destSchema");
-      params.destSchema = `%${query.destSchema.toLowerCase()}%`;
+      conditions.push("UPPER(DEST_SCHEMA) LIKE :destSchema");
+      params.destSchema = `%${query.destSchema.toUpperCase()}%`;
     }
 
     if (query.search) {
@@ -206,7 +207,7 @@ export class OracleJobRunRepository implements JobRunRepository {
   }
 
   /**
-   * Map API sort fields → DB columns
+   * Map API sort fields to DB columns
    */
   private mapSortField(field: string): string {
     const map: Record<string, string> = {

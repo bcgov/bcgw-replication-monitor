@@ -253,4 +253,12 @@ describe("GET /api/schemas", () => {
     const schemas = res.body.schemas;
     expect(schemas.length).toBe(new Set(schemas).size);
   });
+  it("returns case-insensitive distinct schemas", async () => {
+    const res = await request(app).get("/api/schemas");
+    const schemas = res.body.schemas;
+
+    // No two entries should differ only by case
+    const lower = schemas.map((s: string) => s.toLowerCase());
+    expect(lower.length).toBe(new Set(lower).size);
+  });
 });
