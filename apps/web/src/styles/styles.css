@@ -170,3 +170,88 @@ p.bcds-footer--copyright {
 .pagination-page {
   color: #666;
 }
+
+.advanced-filters {
+  margin-bottom: 1rem;
+}
+
+.advanced-filters-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.date-filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  .bcds-react-aria-DatePicker {
+    width: 10rem;
+  }
+}
+
+/*  Combo Box Styles */
+.schema-combobox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-width: 20rem;
+}
+
+.schema-combobox-field {
+  display: flex;
+  align-items: center;
+  width: 20rem;
+}
+
+.schema-combobox-field input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.schema-combobox-field input[data-focused] {
+  outline: 2px solid #013366;
+  outline-offset: -1px;
+  border-color: #013366;
+}
+
+.schema-combobox-field button {
+  margin-left: -2rem; /* overlay icon inside input */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+}
+
+.schema-combobox-popover {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: var(--trigger-width);
+  max-height: 15rem;
+  overflow-y: auto;
+}
+
+.schema-combobox-popover .react-aria-ListBoxItem {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.schema-combobox-popover .react-aria-ListBoxItem[data-focused],
+.schema-combobox-popover .react-aria-ListBoxItem[data-hovered] {
+  background: #f2f2f2;
+}
+
+.schema-combobox-popover .react-aria-ListBoxItem[data-selected] {
+  background: #013366;
+  color: white;
+}
+/********/

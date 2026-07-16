@@ -11,8 +11,15 @@ export interface Sort {
   sortDir: "asc" | "desc";
 }
 
+export interface AdvancedFilters {
+  destSchema: string | null;
+  lastCheckedFrom: string | null; // ISO string or null
+  lastCheckedTo: string | null;
+}
+
 export interface JobRunsQueryState {
   filters: Filters;
+  advanced: AdvancedFilters;
   search: string;
   sort: Sort;
   page: number;
@@ -20,14 +27,20 @@ export interface JobRunsQueryState {
 
 export type JobRunsQueryAction =
   | { type: "SET_FILTERS"; payload: Filters }
+  | { type: "SET_ADVANCED_FILTERS"; payload: AdvancedFilters }
   | { type: "SET_SEARCH"; payload: string }
   | { type: "SET_SORT"; payload: Sort }
   | { type: "SET_PAGE"; payload: number };
 
 export const initialQueryState: JobRunsQueryState = {
   filters: DEFAULT_FILTERS,
+  advanced: {
+    destSchema: null,
+    lastCheckedFrom: null,
+    lastCheckedTo: null,
+  },
   search: "",
-  sort: { sortBy: "lastConverted", sortDir: "desc" },
+  sort: { sortBy: "lastChecked", sortDir: "desc" },
   page: 0,
 };
 
@@ -45,6 +58,8 @@ export function jobRunsQueryReducer(
   switch (action.type) {
     case "SET_FILTERS":
       return { ...state, filters: action.payload, page: 0 };
+    case "SET_ADVANCED_FILTERS":
+      return { ...state, advanced: action.payload, page: 0 };
     case "SET_SEARCH":
       return { ...state, search: action.payload, page: 0 };
     case "SET_SORT":
