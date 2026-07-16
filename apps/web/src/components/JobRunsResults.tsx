@@ -46,26 +46,35 @@ export function JobRunsResults({
 
   return (
     <div>
-      <h2>Results</h2>
-
       {isLoading && <div>Loading job runs...</div>}
       {isError && <div>Failed to load job runs</div>}
 
       {items.length > 0 && (
         <div className="table-scroll">
           <table className="job-runs-table">
+            {/* Status 
+              Method
+              Src 
+              Src Table
+              Dest Schema
+              Dest Table
+              Update Type
+              Records Read
+              Records Written
+              Last Checked
+              Last Converted */}
             <colgroup>
-              <col style={{ width: "6rem" }} /> {/* Status */}
-              <col style={{ width: "5rem" }} /> {/* Method */}
-              <col /> {/* Src Schema */}
-              <col /> {/* Src Table */}
-              <col /> {/* Dest Schema */}
-              <col /> {/* Dest Table */}
-              <col style={{ width: "7rem" }} /> {/* Update Type */}
-              <col style={{ width: "8rem" }} /> {/* Records Read */}
-              <col style={{ width: "8rem" }} /> {/* Records Written */}
-              <col style={{ width: "9%" }} /> {/* Last Checked */}
-              <col style={{ width: "11%" }} /> {/* Last Converted */}
+              <col style={{ width: "6rem" }} />
+              <col style={{ width: "5rem" }} />
+              <col />
+              <col />
+              <col />
+              <col />
+              <col style={{ width: "7rem" }} />
+              <col style={{ width: "8rem" }} />
+              <col style={{ width: "8rem" }} />
+              <col style={{ width: "9%" }} />
+              <col style={{ width: "11%" }} />
             </colgroup>
 
             <thead>
