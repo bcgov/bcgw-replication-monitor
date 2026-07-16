@@ -34,5 +34,20 @@ export function jobRunsRouter(repo: JobRunRepository): Router {
     }
   });
 
+  /**
+   * GET /api/schemas
+   *
+   * Returns the distinct destination schemas for the advanced filter dropdown.
+   */
+  router.get("/schemas", async (_req, res) => {
+    try {
+      const schemas = await repo.listSchemas();
+      return res.json({ schemas });
+    } catch (err) {
+      console.error("list schemas failed", err);
+      return res.status(500).json({ error: "Internal error" });
+    }
+  });
+
   return router;
 }

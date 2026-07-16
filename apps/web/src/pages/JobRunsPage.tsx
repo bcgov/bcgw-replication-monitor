@@ -26,13 +26,13 @@ interface JobRunsResponse {
 
 export function JobRunsPage() {
   const [query, dispatch] = useReducer(jobRunsQueryReducer, initialQueryState);
-  const { filters, search, sort, page } = query;
+  const { filters, search, sort, page, advanced } = query;
   const debouncedSearch = useDebounce(search, 300);
 
   const pageSize = 20;
 
   const { data, isLoading, isError } = useQuery<JobRunsResponse>({
-    queryKey: ["job-runs", filters, debouncedSearch, sort, page],
+    queryKey: ["job-runs", filters, advanced, debouncedSearch, sort, page],
     queryFn: () => {
       const params = new URLSearchParams();
       const appendArrayParam = (key: string, values: string[]) => {
@@ -49,6 +49,16 @@ export function JobRunsPage() {
 
       if (debouncedSearch.trim()) {
         params.append("search", debouncedSearch.trim());
+      }
+
+      if (advanced.destSchema) {
+        params.append("destSchema", advanced.destSchema);
+      }
+      if (advanced.lastCheckedFrom) {
+        params.append("lastCheckedFrom", advanced.lastCheckedFrom);
+      }
+      if (advanced.lastCheckedTo) {
+        params.append("lastCheckedTo", advanced.lastCheckedTo);
       }
 
       params.append("sortBy", sort.sortBy);
@@ -71,7 +81,13 @@ export function JobRunsPage() {
       />
 
       <section style={{ flex: 1, padding: "0.5rem" }}>
-        <AdvancedFilters />
+        <AdvancedFilters
+          value={advanced}
+          onChange={(advanced) =>
+            dispatch({ type: "SET_ADVANCED_FILTERS", payload: advanced })
+          }
+        />
+
         <div className="results-toolbar">
           <SummaryBar
             counts={data?.counts ?? { all: 0, success: 0, failed: 0 }}

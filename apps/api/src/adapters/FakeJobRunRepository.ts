@@ -15,7 +15,7 @@ const SAMPLE: JobRun[] = [
     srcSchema: "SRC_SCHEMA",
     srcTable: "TABLE_A",
     destHost: "dest-host-1",
-    destSchema: "DEST_SCHEMA",
+    destSchema: "DEST_SCHEMA_A",
     destTable: "TABLE_A",
     lastChecked: new Date("2024-01-15T10:00:00Z"),
     lastConverted: new Date("2024-01-15T09:55:00Z"),
@@ -33,7 +33,7 @@ const SAMPLE: JobRun[] = [
     srcSchema: "SRC_SCHEMA",
     srcTable: "TABLE_B",
     destHost: "dest-host-1",
-    destSchema: "DEST_SCHEMA",
+    destSchema: "DEST_SCHEMA_B",
     destTable: "TABLE_B",
     lastChecked: new Date("2024-01-15T10:05:00Z"),
     lastConverted: new Date("2024-01-15T09:50:00Z"),
@@ -85,9 +85,9 @@ export class FakeJobRunRepository implements JobRunRepository {
     }
 
     if (query.destSchema) {
-      const term = query.destSchema.toLowerCase();
+      const term = query.destSchema.toUpperCase();
       results = results.filter((r) =>
-        r.destSchema.toLowerCase().includes(term),
+        r.destSchema.toUpperCase().includes(term),
       );
     }
 
@@ -98,6 +98,20 @@ export class FakeJobRunRepository implements JobRunRepository {
           r.destTable.toLowerCase().includes(term) ||
           (r.logFilename?.toLowerCase().includes(term) ?? false),
       );
+    }
+
+    // Date range filter on "last checked" (advanced filter).
+    // from/to are inclusive bounds; either can be provided independently.
+    if (query.lastCheckedFrom) {
+      const from = query.lastCheckedFrom;
+      results = results.filter((r) => r.lastChecked >= from);
+    }
+
+    if (query.lastCheckedTo) {
+      // Make "to" inclusive of the entire selected day (up to 23:59:59.999)
+      const to = new Date(query.lastCheckedTo);
+      to.setHours(23, 59, 59, 999);
+      results = results.filter((r) => r.lastChecked <= to);
     }
 
     // Compute counts BEFORE status filter
@@ -122,5 +136,18 @@ export class FakeJobRunRepository implements JobRunRepository {
     results = paginate(results, query.offset, query.limit);
 
     return { items: results, total, counts };
+  }
+
+  /**
+   * Returns the distinct destination schemas from the in-memory data.
+   *
+   * Mirrors the Oracle adapter's DISTINCT query so the schema dropdown
+   * behaves the same in dev/test (fake) and production (Oracle).
+   */
+  async listSchemas(): Promise<string[]> {
+    // Set removes duplicates, then sort alphabetically for a stable dropdown order
+    // UPPER-case then dedupe to collapse case variants (matches Oracle)
+    const schemas = new Set(this.data.map((r) => r.destSchema.toUpperCase()));
+    return Array.from(schemas).sort();
   }
 }

@@ -53,4 +53,22 @@ describe("jobRunsQueryReducer", () => {
     expect(next.page).toBe(4);
     expect(next.search).toBe("keep-me"); // unchanged
   });
+
+  it("sets advanced filters and resets page to 0", () => {
+    const state = { ...initialQueryState, page: 4 };
+
+    const next = jobRunsQueryReducer(state, {
+      type: "SET_ADVANCED_FILTERS",
+      payload: {
+        destSchema: "SCHEMA_A",
+        lastCheckedFrom: "2024-01-15",
+        lastCheckedTo: "2024-01-20",
+      },
+    });
+
+    expect(next.advanced.destSchema).toBe("SCHEMA_A");
+    expect(next.advanced.lastCheckedFrom).toBe("2024-01-15");
+    expect(next.advanced.lastCheckedTo).toBe("2024-01-20");
+    expect(next.page).toBe(0); // reset
+  });
 });
