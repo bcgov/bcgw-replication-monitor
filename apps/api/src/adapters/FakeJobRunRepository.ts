@@ -100,6 +100,20 @@ export class FakeJobRunRepository implements JobRunRepository {
       );
     }
 
+    // Date range filter on "last checked" (advanced filter).
+    // from/to are inclusive bounds; either can be provided independently.
+    if (query.lastCheckedFrom) {
+      const from = query.lastCheckedFrom;
+      results = results.filter((r) => r.lastChecked >= from);
+    }
+
+    if (query.lastCheckedTo) {
+      // Make "to" inclusive of the entire selected day (up to 23:59:59.999)
+      const to = new Date(query.lastCheckedTo);
+      to.setHours(23, 59, 59, 999);
+      results = results.filter((r) => r.lastChecked <= to);
+    }
+
     // Compute counts BEFORE status filter
     const counts = {
       all: results.length,

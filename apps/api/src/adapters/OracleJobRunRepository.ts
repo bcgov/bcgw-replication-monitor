@@ -87,7 +87,7 @@ export class OracleJobRunRepository implements JobRunRepository {
       WHERE rnum > :minRow
     `;
 
-      const dataParams: Record<string, string | number> = {
+      const dataParams: Record<string, string | number | Date> = {
         ...params,
         maxRow: query.offset + query.limit,
         minRow: query.offset,
@@ -144,7 +144,7 @@ export class OracleJobRunRepository implements JobRunRepository {
   private buildWhere(query: JobRunQuery): {
     where: string;
 
-    params: Record<string, string | number>;
+    params: Record<string, string | number | Date>;
   } {
     // If any filter is explicitly empty, return no results
     if (
@@ -158,7 +158,7 @@ export class OracleJobRunRepository implements JobRunRepository {
       };
     }
     const conditions: string[] = [];
-    const params: Record<string, string | number> = {};
+    const params: Record<string, string | number | Date> = {};
 
     if (query.status?.length) {
       const allDbValues = query.status.flatMap((s) => this.mapStatusToDb(s));
@@ -188,6 +188,17 @@ export class OracleJobRunRepository implements JobRunRepository {
     if (query.destSchema) {
       conditions.push("UPPER(DEST_SCHEMA) LIKE :destSchema");
       params.destSchema = `%${query.destSchema.toUpperCase()}%`;
+    }
+
+    if (query.lastCheckedFrom) {
+      conditions.push("LAST_CHECKED >= :lastCheckedFrom");
+      params.lastCheckedFrom = query.lastCheckedFrom;
+    }
+
+    if (query.lastCheckedTo) {
+      // Inclusive of the full day: LAST_CHECKED < (to + 1 day)
+      conditions.push("LAST_CHECKED < :lastCheckedTo + 1");
+      params.lastCheckedTo = query.lastCheckedTo;
     }
 
     if (query.search) {
@@ -226,11 +237,11 @@ export class OracleJobRunRepository implements JobRunRepository {
       dbInstance: "DB_INSTANCE",
     };
 
-    return map[field] ?? "LAST_CONVERTED";
+    return map[field] ?? "LAST_CHECKED";
   }
 
   /**
-   * Map Oracle row → domain model
+   * Map Oracle row to domain model
    */
   private mapRow(row: Record<string, unknown>): JobRun {
     return {

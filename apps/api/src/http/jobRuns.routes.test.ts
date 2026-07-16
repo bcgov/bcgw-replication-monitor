@@ -145,12 +145,12 @@ describe("GET /api/job-runs", () => {
     expect(statuses).toEqual([...statuses].sort().reverse());
   });
 
-  it("defaults to sorting by lastConverted desc", async () => {
+  it("defaults to sorting by lastChecked desc", async () => {
     const res = await request(app).get("/api/job-runs");
 
     expect(res.status).toBe(200);
     const dates = res.body.items.map(
-      (r: { lastConverted: string }) => r.lastConverted,
+      (r: { lastChecked: string }) => r.lastChecked,
     );
     expect(dates).toEqual([...dates].sort().reverse());
   });
@@ -158,8 +158,14 @@ describe("GET /api/job-runs", () => {
   it("returns dates as ISO strings", async () => {
     const res = await request(app).get("/api/job-runs");
 
-    expect(res.body.items[0].lastChecked).toBe("2024-01-15T10:00:00.000Z");
-    expect(res.body.items[0].lastConverted).toBe("2024-01-15T09:55:00.000Z");
+    // Find a specific row
+    const row = res.body.items.find(
+      (r: { lastChecked: string }) =>
+        r.lastChecked === "2024-01-15T10:00:00.000Z",
+    );
+
+    expect(row).toBeDefined();
+    expect(row.lastConverted).toBe("2024-01-15T09:55:00.000Z");
   });
 
   it("returns 400 for invalid status", async () => {
@@ -253,6 +259,43 @@ describe("GET /api/schemas", () => {
     const schemas = res.body.schemas;
     expect(schemas.length).toBe(new Set(schemas).size);
   });
+
+  it("filters by lastCheckedFrom", async () => {
+    const res = await request(app).get(
+      "/api/job-runs?lastCheckedFrom=2024-01-15T10:03:00.000Z",
+    );
+
+    expect(res.status).toBe(200);
+    // Only rows with lastChecked >= the given time
+    res.body.items.forEach((r: { lastChecked: string }) => {
+      expect(new Date(r.lastChecked).getTime()).toBeGreaterThanOrEqual(
+        new Date("2024-01-15T10:03:00.000Z").getTime(),
+      );
+    });
+  });
+
+  it("filters by lastCheckedTo (inclusive of full day)", async () => {
+    // Date-only "to" should include all rows from that day
+    const res = await request(app).get(
+      "/api/job-runs?lastCheckedTo=2024-01-15",
+    );
+
+    expect(res.status).toBe(200);
+    res.body.items.forEach((r: { lastChecked: string }) => {
+      const endOfDay = new Date("2024-01-15T23:59:59.999Z").getTime();
+      expect(new Date(r.lastChecked).getTime()).toBeLessThanOrEqual(endOfDay);
+    });
+  });
+
+  it("returns 400 for invalid date", async () => {
+    const res = await request(app).get(
+      "/api/job-runs?lastCheckedFrom=not-a-date",
+    );
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("Invalid query");
+  });
+
   it("returns case-insensitive distinct schemas", async () => {
     const res = await request(app).get("/api/schemas");
     const schemas = res.body.schemas;
