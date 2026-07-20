@@ -1,8 +1,15 @@
 node_modules/
 dist/
 build/
+coverage/
+
+# Secrets / env
 .env
-.env.local
+.env.*
+!.env.example
+openshift/**/secret.yaml
+*.secret.yaml
+
+# Misc
 *.log
 .DS_Store
-coverage/
