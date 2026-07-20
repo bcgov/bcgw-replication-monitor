@@ -12,8 +12,9 @@ export function createApp(repo: JobRunRepository) {
 
   app.use(express.json());
 
+  // Liveness/readiness probe with no DB call
   app.get("/health", (_req, res) => {
-    res.send("OK");
+    res.status(200).json({ status: "ok" });
   });
 
   app.use("/api", jobRunsRouter(repo));
