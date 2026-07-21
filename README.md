@@ -20,10 +20,8 @@ apps/
       ports/             # Interfaces (e.g. JobRunRepository)
       adapters/          # Implementations (Fake, Oracle)
       http/              # Routes and mappers
-      infrastructure/    # Config, factories, DB
+      infrastructure/    # Config, DB
   web/                   # Frontend (React + Vite)
-packages/
-  shared/                # Shared types (DTOs, enums)
 ```
 
 The backend uses ports and adapters to decouple the domain from data sources.
@@ -59,12 +57,27 @@ Controlled by `USE_FAKE_REPO` in `apps/api/.env`:
 
 ## Environment Variables
 
-### Backend (`apps/api/.env`)
+### API (`repl-monitor-api`)
 
-| Variable | Description | Default |
-|---|---|---|
-| `PORT` | Server port | `3000` |
-| `USE_FAKE_REPO` | Use in-memory data instead of Oracle | `true` |
+
+| Variable        | Example      | Description                       |
+|-----------------|--------------|-----------------------------------|
+| `PORT`          | `3000`       | Port the API listens on           |
+| `NODE_ENV`      | `development` | Node environment                  |
+| `USE_FAKE_REPO` | `false`      | Use in-memory fake data if `true` |
+
+
+| Variable                | Description                             |
+|-------------------------|-----------------------------------------|
+| `ORACLE_USER`           | Oracle username                         |
+| `ORACLE_PASSWORD`       | Oracle password                         |
+| `ORACLE_CONNECT_STRING` | Oracle connection (`host:port/service`) |
+| `ORACLE_VIEW`           | Main-page view name                     |
+| `ORACLE_HISTORY_VIEW`   | History view name                       |
+
+### Web (`repl-monitor-web`)
+
+No runtime environment variables. The frontend is pre-built static files served by nginx, calling the API via relative `/api` paths.
 
 ## Docker
 
