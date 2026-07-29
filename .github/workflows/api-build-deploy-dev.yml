@@ -1,0 +1,57 @@
+name: API Build & Deploy (dev)
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+
+jobs:
+  build-deploy:
+    if: github.event.pull_request.merged == true
+    environment: dev
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Login to OpenShift registry
+        run: |
+          docker login ${{ secrets.PUBLIC_IMAGE_REPOSITORY }} \
+            -u ${{ secrets.OPENSHIFT_SA_NAME }} \
+            -p ${{ secrets.OPENSHIFT_SA_TOOLS_TOKEN }}
+
+      - name: Build & tag image
+        run: |
+          cd apps/api
+          docker build . -f Dockerfile \
+            -t ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/repl-monitor-api:${{ github.sha }} \
+            -t ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/repl-monitor-api:dev
+
+      - name: Push image
+        run: |
+          docker push -a ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/repl-monitor-api
+
+      - name: Install oc CLI
+        run: |
+          curl -L https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz | tar -xz
+          sudo mv oc /usr/local/bin/oc
+
+      - name: Login to OpenShift
+        run: |
+          oc login ${{ secrets.OPENSHIFT_SERVER_URL }} \
+            --token=${{ secrets.OPENSHIFT_DEPLOY_TOKEN }} \
+            --insecure-skip-tls-verify=true
+
+      - name: Deploy to dev
+        run: |
+          oc set image deployment/repl-monitor-api \
+            repl-monitor-api=image-registry.openshift-image-registry.svc:5000/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/repl-monitor-api:${{ github.sha }} \
+            -n ${{ secrets.NAMESPACE }}
+          oc rollout status deployment/repl-monitor-api -n ${{ secrets.NAMESPACE }}
