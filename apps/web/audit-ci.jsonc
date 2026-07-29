@@ -4,6 +4,6 @@
     // GHSA-qwww-vcr4-c8h2 — react-router RSC CSRF.
     // Only affects apps using unstable RSC APIs (we do NOT use RSC).
     // Fix requires react-router v8 + React 19 (major upgrade, not backported to v7).
-    "GHSA-qwww-vcr4-c8h2"
-  ]
+    "GHSA-qwww-vcr4-c8h2",
+  ],
 }
