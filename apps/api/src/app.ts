@@ -1,6 +1,7 @@
 import express from "express";
 import { JobRunRepository } from "./ports/JobRunRepository";
 import { jobRunsRouter } from "./http/jobRuns.routes";
+import { adminAuth } from "./http/adminAuth";
 
 /**
  * Creates the Express app.
@@ -17,7 +18,7 @@ export function createApp(repo: JobRunRepository) {
     res.status(200).json({ status: "ok" });
   });
 
-  app.use("/api", jobRunsRouter(repo));
+  app.use("/api", adminAuth, jobRunsRouter(repo));
 
   return app;
 }
