@@ -1,5 +1,7 @@
 name: Promote API
 
+permissions: {}
+
 on:
   workflow_dispatch:
     inputs:
