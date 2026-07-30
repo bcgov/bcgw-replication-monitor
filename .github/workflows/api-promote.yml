@@ -1,0 +1,41 @@
+name: Promote API
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        required: true
+        type: choice
+        options:
+          - test
+          - prod
+      image_tag_sha:
+        description: "Commit SHA to deploy"
+        required: true
+
+jobs:
+  promote:
+    runs-on: ubuntu-22.04
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Install oc CLI
+        run: |
+          curl -L https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz | tar -xz
+          sudo mv oc /usr/local/bin/oc
+
+      - name: Login to OpenShift
+        run: |
+          oc login ${{ secrets.OPENSHIFT_SERVER_URL }} \
+            --token=${{ secrets.OPENSHIFT_DEPLOY_TOKEN }} \
+            --insecure-skip-tls-verify=true
+
+      - name: Set image in target namespace
+        run: |
+          oc set image deployment/repl-monitor-api \
+            repl-monitor-api=image-registry.openshift-image-registry.svc:5000/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/repl-monitor-api:${{ inputs.image_tag_sha }} \
+            -n ${{ secrets.NAMESPACE }}
+
+      - name: Wait for rollout
+        run: |
+          oc rollout status deployment/repl-monitor-api -n ${{ secrets.NAMESPACE }}
