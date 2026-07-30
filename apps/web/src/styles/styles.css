@@ -179,7 +179,6 @@ p.bcds-footer--copyright {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding-top: 0.5rem;
 }
 
 .date-filters {
