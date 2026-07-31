@@ -1,4 +1,4 @@
-import { Component, ReactNode } from "react";
+import { Component, type ReactNode } from "react";
 import { ForbiddenError } from "../api/client"; // adjust path
 import { AccessDenied } from "./AccessDenied";
 
