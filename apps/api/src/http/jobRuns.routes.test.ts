@@ -302,3 +302,30 @@ describe("GET /api/schemas", () => {
     expect(lower.length).toBe(new Set(lower).size);
   });
 });
+
+/*
+ * Test suite for admin authorization
+ */
+describe("admin authorization", () => {
+  it("returns 403 when X-Userinfo header is missing", async () => {
+    const res = await request(app).get("/api/job-runs");
+    expect(res.status).toBe(403);
+  });
+
+  it("returns 403 for a non-admin user", async () => {
+    const nonAdmin = Buffer.from(
+      JSON.stringify({ client_roles: ["viewer"] }),
+    ).toString("base64");
+
+    const res = await request(app)
+      .get("/api/job-runs")
+      .set("X-Userinfo", nonAdmin);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("allows an admin user", async () => {
+    const res = await authedGet("/api/job-runs");
+    expect(res.status).toBe(200);
+  });
+});
