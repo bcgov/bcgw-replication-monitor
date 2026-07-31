@@ -6,12 +6,21 @@ import { FakeJobRunRepository } from "../adapters/FakeJobRunRepository";
 const repo = new FakeJobRunRepository();
 const app = createApp(repo);
 
+// Base64-encoded admin userinfo, mimicking what Kong forwards via X-Userinfo
+const adminUserInfo = Buffer.from(
+  JSON.stringify({ client_roles: ["admin"] }),
+).toString("base64");
+
+// Helper: a GET request with the admin auth header attached
+const authedGet = (url: string) =>
+  request(app).get(url).set("X-Userinfo", adminUserInfo);
+
 /*
  * Test suite for job runs API
  */
 describe("GET /api/job-runs", () => {
   it("returns all job runs with pagination metadata", async () => {
-    const res = await request(app).get("/api/job-runs");
+    const res = await authedGet("/api/job-runs");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(2);
@@ -21,7 +30,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("filters by single status", async () => {
-    const res = await request(app).get("/api/job-runs?status=success");
+    const res = await authedGet("/api/job-runs?status=success");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
@@ -29,16 +38,14 @@ describe("GET /api/job-runs", () => {
   });
 
   it("filters by multiple statuses", async () => {
-    const res = await request(app).get(
-      "/api/job-runs?status=success&status=failed",
-    );
+    const res = await authedGet("/api/job-runs?status=success&status=failed");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(2);
   });
 
   it("filters by destTable", async () => {
-    const res = await request(app).get("/api/job-runs?search=TABLE_A");
+    const res = await authedGet("/api/job-runs?search=TABLE_A");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
@@ -46,7 +53,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("filters by logFilename", async () => {
-    const res = await request(app).get("/api/job-runs?search=fme_table_a");
+    const res = await authedGet("/api/job-runs?search=fme_table_a");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
@@ -55,14 +62,14 @@ describe("GET /api/job-runs", () => {
 
   it("search no longer matches srcSchema", async () => {
     // SRC_SCHEMA exists in data but should not match (search only covers destTable + logFilename)
-    const res = await request(app).get("/api/job-runs?search=SRC_SCHEMA");
+    const res = await authedGet("/api/job-runs?search=SRC_SCHEMA");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(0);
   });
 
   it("filters by single gateway", async () => {
-    const res = await request(app).get("/api/job-runs?gateway=fme");
+    const res = await authedGet("/api/job-runs?gateway=fme");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
@@ -70,16 +77,14 @@ describe("GET /api/job-runs", () => {
   });
 
   it("filters by multiple gateways", async () => {
-    const res = await request(app).get(
-      "/api/job-runs?gateway=fme&gateway=oracle",
-    );
+    const res = await authedGet("/api/job-runs?gateway=fme&gateway=oracle");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(2);
   });
 
   it("filters by single dbInstance", async () => {
-    const res = await request(app).get("/api/job-runs?dbInstance=prod");
+    const res = await authedGet("/api/job-runs?dbInstance=prod");
 
     expect(res.status).toBe(200);
     expect(res.body.items.length).toBeGreaterThan(0);
@@ -91,7 +96,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("filters by multiple dbInstances", async () => {
-    const res = await request(app).get(
+    const res = await authedGet(
       "/api/job-runs?dbInstance=prod&dbInstance=test",
     );
 
@@ -100,7 +105,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("paginates with limit", async () => {
-    const res = await request(app).get("/api/job-runs?limit=1");
+    const res = await authedGet("/api/job-runs?limit=1");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
@@ -109,7 +114,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("paginates with offset", async () => {
-    const res = await request(app).get("/api/job-runs?limit=1&offset=1");
+    const res = await authedGet("/api/job-runs?limit=1&offset=1");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
@@ -118,7 +123,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("returns empty items when offset exceeds total", async () => {
-    const res = await request(app).get("/api/job-runs?offset=100");
+    const res = await authedGet("/api/job-runs?offset=100");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(0);
@@ -126,9 +131,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("sorts by status ascending", async () => {
-    const res = await request(app).get(
-      "/api/job-runs?sortBy=status&sortDir=asc",
-    );
+    const res = await authedGet("/api/job-runs?sortBy=status&sortDir=asc");
 
     expect(res.status).toBe(200);
     const statuses = res.body.items.map((r: { status: string }) => r.status);
@@ -136,9 +139,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("sorts by status descending", async () => {
-    const res = await request(app).get(
-      "/api/job-runs?sortBy=status&sortDir=desc",
-    );
+    const res = await authedGet("/api/job-runs?sortBy=status&sortDir=desc");
 
     expect(res.status).toBe(200);
     const statuses = res.body.items.map((r: { status: string }) => r.status);
@@ -146,7 +147,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("defaults to sorting by lastChecked desc", async () => {
-    const res = await request(app).get("/api/job-runs");
+    const res = await authedGet("/api/job-runs");
 
     expect(res.status).toBe(200);
     const dates = res.body.items.map(
@@ -156,7 +157,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("returns dates as ISO strings", async () => {
-    const res = await request(app).get("/api/job-runs");
+    const res = await authedGet("/api/job-runs");
 
     // Find a specific row
     const row = res.body.items.find(
@@ -169,42 +170,42 @@ describe("GET /api/job-runs", () => {
   });
 
   it("returns 400 for invalid status", async () => {
-    const res = await request(app).get("/api/job-runs?status=invalid");
+    const res = await authedGet("/api/job-runs?status=invalid");
 
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("Invalid query");
   });
 
   it("returns 400 for invalid gateway", async () => {
-    const res = await request(app).get("/api/job-runs?gateway=invalid");
+    const res = await authedGet("/api/job-runs?gateway=invalid");
 
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("Invalid query");
   });
 
   it("returns 400 for invalid dbInstance", async () => {
-    const res = await request(app).get("/api/job-runs?dbInstance=invalid");
+    const res = await authedGet("/api/job-runs?dbInstance=invalid");
 
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("Invalid query");
   });
 
   it("returns 400 for invalid sortBy", async () => {
-    const res = await request(app).get("/api/job-runs?sortBy=invalid");
+    const res = await authedGet("/api/job-runs?sortBy=invalid");
 
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("Invalid query");
   });
 
   it("returns 400 for invalid sortDir", async () => {
-    const res = await request(app).get("/api/job-runs?sortDir=invalid");
+    const res = await authedGet("/api/job-runs?sortDir=invalid");
 
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("Invalid query");
   });
 
   it("returns counts in response", async () => {
-    const res = await request(app).get("/api/job-runs");
+    const res = await authedGet("/api/job-runs");
 
     expect(res.status).toBe(200);
     expect(res.body.counts).toBeDefined();
@@ -215,7 +216,7 @@ describe("GET /api/job-runs", () => {
 
   it("counts ignore the status filter", async () => {
     // Filter by only "success" — counts should still show both
-    const res = await request(app).get("/api/job-runs?status=success");
+    const res = await authedGet("/api/job-runs?status=success");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
@@ -225,7 +226,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("counts respect non-status filters", async () => {
-    const res = await request(app).get("/api/job-runs?gateway=fme");
+    const res = await authedGet("/api/job-runs?gateway=fme");
 
     expect(res.status).toBe(200);
     expect(res.body.counts.all).toBe(1);
@@ -239,7 +240,7 @@ describe("GET /api/job-runs", () => {
  */
 describe("GET /api/schemas", () => {
   it("returns distinct schemas", async () => {
-    const res = await request(app).get("/api/schemas");
+    const res = await authedGet("/api/schemas");
 
     expect(res.status).toBe(200);
     expect(res.body.schemas).toBeDefined();
@@ -247,21 +248,21 @@ describe("GET /api/schemas", () => {
   });
 
   it("returns schemas sorted alphabetically", async () => {
-    const res = await request(app).get("/api/schemas");
+    const res = await authedGet("/api/schemas");
 
     const schemas = res.body.schemas;
     expect(schemas).toEqual([...schemas].sort());
   });
 
   it("returns no duplicate schemas", async () => {
-    const res = await request(app).get("/api/schemas");
+    const res = await authedGet("/api/schemas");
 
     const schemas = res.body.schemas;
     expect(schemas.length).toBe(new Set(schemas).size);
   });
 
   it("filters by lastCheckedFrom", async () => {
-    const res = await request(app).get(
+    const res = await authedGet(
       "/api/job-runs?lastCheckedFrom=2024-01-15T10:03:00.000Z",
     );
 
@@ -276,9 +277,7 @@ describe("GET /api/schemas", () => {
 
   it("filters by lastCheckedTo (inclusive of full day)", async () => {
     // Date-only "to" should include all rows from that day
-    const res = await request(app).get(
-      "/api/job-runs?lastCheckedTo=2024-01-15",
-    );
+    const res = await authedGet("/api/job-runs?lastCheckedTo=2024-01-15");
 
     expect(res.status).toBe(200);
     res.body.items.forEach((r: { lastChecked: string }) => {
@@ -288,20 +287,45 @@ describe("GET /api/schemas", () => {
   });
 
   it("returns 400 for invalid date", async () => {
-    const res = await request(app).get(
-      "/api/job-runs?lastCheckedFrom=not-a-date",
-    );
+    const res = await authedGet("/api/job-runs?lastCheckedFrom=not-a-date");
 
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("Invalid query");
   });
 
   it("returns case-insensitive distinct schemas", async () => {
-    const res = await request(app).get("/api/schemas");
+    const res = await authedGet("/api/schemas");
     const schemas = res.body.schemas;
 
     // No two entries should differ only by case
     const lower = schemas.map((s: string) => s.toLowerCase());
     expect(lower.length).toBe(new Set(lower).size);
+  });
+});
+
+/*
+ * Test suite for admin authorization
+ */
+describe("admin authorization", () => {
+  it("returns 403 when X-Userinfo header is missing", async () => {
+    const res = await request(app).get("/api/job-runs");
+    expect(res.status).toBe(403);
+  });
+
+  it("returns 403 for a non-admin user", async () => {
+    const nonAdmin = Buffer.from(
+      JSON.stringify({ client_roles: ["viewer"] }),
+    ).toString("base64");
+
+    const res = await request(app)
+      .get("/api/job-runs")
+      .set("X-Userinfo", nonAdmin);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("allows an admin user", async () => {
+    const res = await authedGet("/api/job-runs");
+    expect(res.status).toBe(200);
   });
 });
