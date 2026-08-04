@@ -3,6 +3,7 @@ import { JobHistoryPage } from "./pages/JobHistoryPage";
 import { AppLayout } from "./layouts/AppLayout";
 import { JobRunsPage } from "./pages/JobRunsPage";
 import { AuthErrorBoundary } from "./components/AuthErrorBoundary";
+import { AuthGate } from "./components/AuthGate";
 
 /**
  * Root app router.
@@ -13,12 +14,14 @@ function App() {
   return (
     <BrowserRouter>
       <AuthErrorBoundary>
-        <Routes>
-          <Route path="/" element={<AppLayout />}>
-            <Route index element={<JobRunsPage />} />
-            <Route path="history/:jobId" element={<JobHistoryPage />} />
-          </Route>
-        </Routes>
+        <AuthGate>
+          <Routes>
+            <Route path="/" element={<AppLayout />}>
+              <Route index element={<JobRunsPage />} />
+              <Route path="history/:jobId" element={<JobHistoryPage />} />
+            </Route>
+          </Routes>
+        </AuthGate>
       </AuthErrorBoundary>
     </BrowserRouter>
   );
