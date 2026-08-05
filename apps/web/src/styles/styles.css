@@ -1,3 +1,10 @@
+.auth-loading {
+  display: flex;
+  justify-content: center;
+  padding: 4rem;
+  color: #666;
+}
+
 .footer-links {
   list-style-type: none;
   padding: 0;

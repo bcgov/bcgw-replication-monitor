@@ -329,3 +329,30 @@ describe("admin authorization", () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe("GET /api/me", () => {
+  it("returns roles for an authenticated user", async () => {
+    const res = await request(app)
+      .get("/api/me")
+      .set("X-Userinfo", adminUserInfo);
+
+    expect(res.status).toBe(200);
+    expect(res.body.roles).toContain("admin");
+  });
+
+  it("returns roles for a non-admin user (not blocked)", async () => {
+    const nonAdmin = Buffer.from(
+      JSON.stringify({ client_roles: ["viewer"] }),
+    ).toString("base64");
+
+    const res = await request(app).get("/api/me").set("X-Userinfo", nonAdmin);
+
+    expect(res.status).toBe(200); // NOT 403, /api/me is open
+    expect(res.body.roles).toEqual(["viewer"]);
+  });
+
+  it("returns 401 without X-Userinfo", async () => {
+    const res = await request(app).get("/api/me");
+    expect(res.status).toBe(401);
+  });
+});
