@@ -102,6 +102,7 @@ export function JobRunsPage() {
 
           <TextField
             aria-label="Search"
+            className="results-search"
             value={search}
             onChange={(value) =>
               dispatch({ type: "SET_SEARCH", payload: value })
