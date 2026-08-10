@@ -16,7 +16,13 @@ beforeAll(() => {
 
 describe("FiltersPanel", () => {
   it("renders filter groups", () => {
-    render(<FiltersPanel filters={DEFAULT_FILTERS} onChange={vi.fn()} />);
+    render(
+      <FiltersPanel
+        filters={DEFAULT_FILTERS}
+        onChange={vi.fn()}
+        onResetAll={vi.fn()}
+      />,
+    );
 
     expect(screen.getByText("Method")).toBeInTheDocument();
     expect(screen.getByText("Status")).toBeInTheDocument();
@@ -24,7 +30,13 @@ describe("FiltersPanel", () => {
   });
 
   it("applies default checked values", () => {
-    render(<FiltersPanel filters={DEFAULT_FILTERS} onChange={vi.fn()} />);
+    render(
+      <FiltersPanel
+        filters={DEFAULT_FILTERS}
+        onChange={vi.fn()}
+        onResetAll={vi.fn()}
+      />,
+    );
 
     expect(screen.getByLabelText("FME")).toBeChecked();
     expect(screen.getByLabelText("MVW")).toBeChecked();
@@ -40,7 +52,13 @@ describe("FiltersPanel", () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
 
-    render(<FiltersPanel filters={DEFAULT_FILTERS} onChange={onChange} />);
+    render(
+      <FiltersPanel
+        filters={DEFAULT_FILTERS}
+        onChange={onChange}
+        onResetAll={vi.fn()}
+      />,
+    );
 
     await user.click(screen.getByLabelText("FME"));
 
@@ -49,17 +67,18 @@ describe("FiltersPanel", () => {
 
   it("resets filters when clicking reset button", async () => {
     const user = userEvent.setup();
-    const onChange = vi.fn();
+    const onResetAll = vi.fn();
 
     render(
       <FiltersPanel
         filters={{ ...DEFAULT_FILTERS, gateway: [] }}
-        onChange={onChange}
+        onChange={vi.fn()}
+        onResetAll={onResetAll}
       />,
     );
 
     await user.click(screen.getByRole("button", { name: /reset filters/i }));
 
-    expect(onChange).toHaveBeenCalledWith(DEFAULT_FILTERS);
+    expect(onResetAll).toHaveBeenCalled();
   });
 });
