@@ -78,6 +78,7 @@ export function JobRunsPage() {
       <FiltersPanel
         filters={filters}
         onChange={(f) => dispatch({ type: "SET_FILTERS", payload: f })}
+        onResetAll={() => dispatch({ type: "RESET_ALL" })}
       />
 
       <section style={{ flex: 1, padding: "0.5rem" }}>

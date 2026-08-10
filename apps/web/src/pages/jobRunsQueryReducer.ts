@@ -30,7 +30,8 @@ export type JobRunsQueryAction =
   | { type: "SET_ADVANCED_FILTERS"; payload: AdvancedFilters }
   | { type: "SET_SEARCH"; payload: string }
   | { type: "SET_SORT"; payload: Sort }
-  | { type: "SET_PAGE"; payload: number };
+  | { type: "SET_PAGE"; payload: number }
+  | { type: "RESET_ALL" };
 
 export const initialQueryState: JobRunsQueryState = {
   filters: DEFAULT_FILTERS,
@@ -66,6 +67,12 @@ export function jobRunsQueryReducer(
       return { ...state, sort: action.payload, page: 0 };
     case "SET_PAGE":
       return { ...state, page: action.payload };
+    case "RESET_ALL":
+      // Reset filters, advanced filters, search, and page back to initial.
+      return {
+        ...initialQueryState,
+        sort: state.sort,
+      };
     default:
       return state;
   }

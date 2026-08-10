@@ -5,7 +5,6 @@ import {
   Checkbox,
   CheckboxGroup,
 } from "@bcgov/design-system-react-components";
-import { DEFAULT_FILTERS } from "../constants/filterDefaults";
 
 type Filters = {
   status: string[];
@@ -16,6 +15,7 @@ type Filters = {
 interface Props {
   filters: Filters;
   onChange: (filters: Filters) => void;
+  onResetAll: () => void;
 }
 
 /**
@@ -24,7 +24,7 @@ interface Props {
  * Contains checkbox filters inside a collapsible accordion.
  * Uses BC Gov design system components.
  */
-export function FiltersPanel({ filters, onChange }: Props) {
+export function FiltersPanel({ filters, onChange, onResetAll }: Props) {
   return (
     <aside className="filters-panel">
       <AccordionGroup defaultExpandedKeys={["jobs"]}>
@@ -68,11 +68,7 @@ export function FiltersPanel({ filters, onChange }: Props) {
               <Checkbox value="prod">Prod</Checkbox>
             </CheckboxGroup>
 
-            <Button
-              variant="secondary"
-              size="small"
-              onPress={() => onChange(DEFAULT_FILTERS)}
-            >
+            <Button variant="secondary" size="small" onPress={onResetAll}>
               Reset Filters
             </Button>
           </div>
