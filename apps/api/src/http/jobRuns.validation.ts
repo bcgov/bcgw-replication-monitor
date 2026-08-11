@@ -39,4 +39,22 @@ export const JobRunsQuerySchema = z.object({
   lastCheckedTo: z.coerce.date().optional(),
 });
 
+/**
+ * Path params for the history endpoint, the job identifier.
+ */
+export const JobHistoryParamsSchema = z.object({
+  destSchema: z.string().trim().min(1),
+  destTable: z.string().trim().min(1),
+});
+
+/**
+ * Query params for the history endpoint, sorting only (no filters/pagination).
+ */
+export const JobHistoryQuerySchema = z.object({
+  sortBy: z.enum(JOB_RUN_SORT_FIELDS).default("lastChecked"),
+  sortDir: z.enum(SORT_DIRECTIONS).default("desc"),
+});
+
+export type JobHistoryParams = z.infer<typeof JobHistoryParamsSchema>;
+export type JobHistoryQuery = z.infer<typeof JobHistoryQuerySchema>;
 export type JobRunsQuery = z.infer<typeof JobRunsQuerySchema>;

@@ -21,7 +21,11 @@ export async function createJobRunRepository(): Promise<JobRunRepository> {
   //Lazy init Oracle repo (pool created once)
   if (!oracleRepo) {
     const pool = await createPool();
-    oracleRepo = new OracleJobRunRepository(pool, config.oracle.view);
+    oracleRepo = new OracleJobRunRepository(
+      pool,
+      config.oracle.view,
+      config.oracle.historyView,
+    );
   }
 
   return oracleRepo;

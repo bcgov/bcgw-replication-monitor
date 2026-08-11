@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { JobRunRepository } from "../ports/JobRunRepository";
 import { toDto } from "./jobRun.mapper";
-import { JobRunsQuerySchema } from "./jobRuns.validation";
+import {
+  JobRunsQuerySchema,
+  JobHistoryParamsSchema,
+  JobHistoryQuerySchema,
+} from "./jobRuns.validation";
 
 /**
  * Creates the job runs router.
@@ -45,6 +49,46 @@ export function jobRunsRouter(repo: JobRunRepository): Router {
       return res.json({ schemas });
     } catch (err) {
       console.error("list schemas failed", err);
+      return res.status(500).json({ error: "Internal error" });
+    }
+  });
+
+  /**
+   * GET /api/history/:destSchema/:destTable
+   *
+   * Returns all historical runs for a single job (identified by destination
+   * schema + table), sorted. No filters or pagination.
+   */
+  router.get("/history/:destSchema/:destTable", async (req, res) => {
+    // Validate the job identifier (path params)
+    const parsedParams = JobHistoryParamsSchema.safeParse(req.params);
+    if (!parsedParams.success) {
+      return res.status(400).json({
+        error: "Invalid job identifier",
+        details: parsedParams.error.issues,
+      });
+    }
+
+    // Validate sort (query params)
+    const parsedQuery = JobHistoryQuerySchema.safeParse(req.query);
+    if (!parsedQuery.success) {
+      return res.status(400).json({
+        error: "Invalid query",
+        details: parsedQuery.error.issues,
+      });
+    }
+
+    try {
+      const runs = await repo.findHistory({
+        destSchema: parsedParams.data.destSchema,
+        destTable: parsedParams.data.destTable,
+        sortBy: parsedQuery.data.sortBy,
+        sortDir: parsedQuery.data.sortDir,
+      });
+
+      return res.json({ items: runs.map(toDto) });
+    } catch (err) {
+      console.error("job history failed", err);
       return res.status(500).json({ error: "Internal error" });
     }
   });

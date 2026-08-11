@@ -1,3 +1,5 @@
+import { JobHistoryQuery } from "../domain/JobHistoryQuery";
+import { JobRun } from "../domain/JobRun";
 import { JobRunPage } from "../domain/JobRunPage";
 import { JobRunQuery } from "../domain/JobRunQuery";
 
@@ -14,4 +16,11 @@ export interface JobRunRepository {
    * Used to populate the advanced filter's schema dropdown.
    */
   listSchemas(): Promise<string[]>;
+
+  /**
+   * Returns all historical runs for a single job, identified by its
+   * destination schema + table, sorted per the given options.
+   * Reads from the history view (all runs), not the main view.
+   */
+  findHistory(query: JobHistoryQuery): Promise<JobRun[]>;
 }

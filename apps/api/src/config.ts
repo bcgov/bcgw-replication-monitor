@@ -12,5 +12,6 @@ export const config = {
     password: process.env.ORACLE_PASSWORD || "",
     connectString: process.env.ORACLE_CONNECT_STRING || "",
     view: process.env.ORACLE_VIEW || "ETL_JOB_RUNS_V",
+    historyView: process.env.ORACLE_HISTORY_VIEW || "ETL_JOB_RUNS_HISTORY_V",
   },
 };
