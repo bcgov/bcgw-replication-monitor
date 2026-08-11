@@ -3,6 +3,7 @@ import { JobRun } from "../domain/JobRun";
 import { JobRunRepository } from "../ports/JobRunRepository";
 import { JobRunQuery } from "../domain/JobRunQuery";
 import { JobRunPage } from "../domain/JobRunPage";
+import { JobHistoryQuery } from "../domain/JobHistoryQuery";
 
 /**
  * Oracle implementation of JobRunRepository.
@@ -13,6 +14,7 @@ export class OracleJobRunRepository implements JobRunRepository {
   constructor(
     private readonly pool: oracledb.Pool,
     private readonly view: string,
+    private readonly historyView: string,
   ) {}
 
   async find(query: JobRunQuery): Promise<JobRunPage> {
@@ -134,6 +136,43 @@ export class OracleJobRunRepository implements JobRunRepository {
       return (result.rows ?? []).map((row) => row.DEST_SCHEMA);
     } finally {
       // Always release the connection back to the pool
+      await connection.close();
+    }
+  }
+
+  /**
+   * Returns all historical runs for a single job from the Oracle history view.
+   *
+   * The job is identified by destination schema + table (matched
+   * case-insensitively via UPPER, consistent with the rest of the app). Reads
+   * from the history view (all runs) rather than the main view (latest run per
+   * job). No filters or pagination, just the full run history, sorted.
+   */
+  async findHistory(query: JobHistoryQuery): Promise<JobRun[]> {
+    const connection = await this.pool.getConnection();
+
+    try {
+      const sql = `
+      SELECT *
+      FROM ${this.historyView}
+      WHERE UPPER(DEST_SCHEMA) = :destSchema
+        AND UPPER(DEST_TABLE) = :destTable
+      ORDER BY ${this.mapSortField(query.sortBy)} ${query.sortDir.toUpperCase()}
+    `;
+
+      const params: Record<string, string> = {
+        destSchema: query.destSchema.toUpperCase(),
+        destTable: query.destTable.toUpperCase(),
+      };
+
+      const result = await connection.execute<Record<string, unknown>>(
+        sql,
+        params,
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+      );
+
+      return (result.rows ?? []).map((row) => this.mapRow(row));
+    } finally {
       await connection.close();
     }
   }

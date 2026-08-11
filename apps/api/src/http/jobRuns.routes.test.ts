@@ -23,8 +23,8 @@ describe("GET /api/job-runs", () => {
     const res = await authedGet("/api/job-runs");
 
     expect(res.status).toBe(200);
-    expect(res.body.items).toHaveLength(2);
-    expect(res.body.total).toBe(2);
+    expect(res.body.items).toHaveLength(4);
+    expect(res.body.total).toBe(4);
     expect(res.body.limit).toBe(50);
     expect(res.body.offset).toBe(0);
   });
@@ -33,7 +33,7 @@ describe("GET /api/job-runs", () => {
     const res = await authedGet("/api/job-runs?status=success");
 
     expect(res.status).toBe(200);
-    expect(res.body.items).toHaveLength(1);
+    expect(res.body.items).toHaveLength(2);
     expect(res.body.items[0].status).toBe("success");
   });
 
@@ -41,14 +41,14 @@ describe("GET /api/job-runs", () => {
     const res = await authedGet("/api/job-runs?status=success&status=failed");
 
     expect(res.status).toBe(200);
-    expect(res.body.items).toHaveLength(2);
+    expect(res.body.items).toHaveLength(4);
   });
 
   it("filters by destTable", async () => {
     const res = await authedGet("/api/job-runs?search=TABLE_A");
 
     expect(res.status).toBe(200);
-    expect(res.body.items).toHaveLength(1);
+    expect(res.body.items).toHaveLength(3);
     expect(res.body.items[0].destTable).toBe("TABLE_A");
   });
 
@@ -56,7 +56,7 @@ describe("GET /api/job-runs", () => {
     const res = await authedGet("/api/job-runs?search=fme_table_a");
 
     expect(res.status).toBe(200);
-    expect(res.body.items).toHaveLength(1);
+    expect(res.body.items).toHaveLength(3);
     expect(res.body.items[0].logFilename).toContain("fme_table_a");
   });
 
@@ -72,7 +72,7 @@ describe("GET /api/job-runs", () => {
     const res = await authedGet("/api/job-runs?gateway=fme");
 
     expect(res.status).toBe(200);
-    expect(res.body.items).toHaveLength(1);
+    expect(res.body.items).toHaveLength(3);
     expect(res.body.items[0].gateway).toBe("fme");
   });
 
@@ -80,7 +80,7 @@ describe("GET /api/job-runs", () => {
     const res = await authedGet("/api/job-runs?gateway=fme&gateway=oracle");
 
     expect(res.status).toBe(200);
-    expect(res.body.items).toHaveLength(2);
+    expect(res.body.items).toHaveLength(4);
   });
 
   it("filters by single dbInstance", async () => {
@@ -101,7 +101,7 @@ describe("GET /api/job-runs", () => {
     );
 
     expect(res.status).toBe(200);
-    expect(res.body.items).toHaveLength(2);
+    expect(res.body.items).toHaveLength(4);
   });
 
   it("paginates with limit", async () => {
@@ -109,7 +109,7 @@ describe("GET /api/job-runs", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
-    expect(res.body.total).toBe(2);
+    expect(res.body.total).toBe(4);
     expect(res.body.limit).toBe(1);
   });
 
@@ -118,7 +118,7 @@ describe("GET /api/job-runs", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
-    expect(res.body.total).toBe(2);
+    expect(res.body.total).toBe(4);
     expect(res.body.offset).toBe(1);
   });
 
@@ -127,7 +127,7 @@ describe("GET /api/job-runs", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(0);
-    expect(res.body.total).toBe(2);
+    expect(res.body.total).toBe(4);
   });
 
   it("sorts by status ascending", async () => {
@@ -209,9 +209,9 @@ describe("GET /api/job-runs", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.counts).toBeDefined();
-    expect(res.body.counts.all).toBe(2);
-    expect(res.body.counts.success).toBe(1);
-    expect(res.body.counts.failed).toBe(1);
+    expect(res.body.counts.all).toBe(4);
+    expect(res.body.counts.success).toBe(2);
+    expect(res.body.counts.failed).toBe(2);
   });
 
   it("counts ignore the status filter", async () => {
@@ -219,19 +219,19 @@ describe("GET /api/job-runs", () => {
     const res = await authedGet("/api/job-runs?status=success");
 
     expect(res.status).toBe(200);
-    expect(res.body.items).toHaveLength(1);
-    expect(res.body.counts.all).toBe(2);
-    expect(res.body.counts.success).toBe(1);
-    expect(res.body.counts.failed).toBe(1);
+    expect(res.body.items).toHaveLength(2);
+    expect(res.body.counts.all).toBe(4);
+    expect(res.body.counts.success).toBe(2);
+    expect(res.body.counts.failed).toBe(2);
   });
 
   it("counts respect non-status filters", async () => {
     const res = await authedGet("/api/job-runs?gateway=fme");
 
     expect(res.status).toBe(200);
-    expect(res.body.counts.all).toBe(1);
-    expect(res.body.counts.success).toBe(1);
-    expect(res.body.counts.failed).toBe(0);
+    expect(res.body.counts.all).toBe(3);
+    expect(res.body.counts.success).toBe(2);
+    expect(res.body.counts.failed).toBe(1);
   });
 });
 
@@ -354,5 +354,51 @@ describe("GET /api/me", () => {
   it("returns 401 without X-Userinfo", async () => {
     const res = await request(app).get("/api/me");
     expect(res.status).toBe(401);
+  });
+});
+
+/*
+ * Test suite for the history endpoint
+ */
+describe("GET /api/history/:destSchema/:destTable", () => {
+  it("returns all historical runs for a job", async () => {
+    const res = await authedGet("/api/history/DEST_SCHEMA_A/TABLE_A");
+    expect(res.status).toBe(200);
+    expect(res.body.items).toHaveLength(3);
+  });
+
+  it("returns an empty list for a job with no history", async () => {
+    const res = await authedGet("/api/history/NOPE/NOTHING");
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toEqual([]);
+  });
+
+  it("returns 400 for an invalid sortDir", async () => {
+    const res = await authedGet(
+      "/api/history/DEST_SCHEMA/TABLE_A?sortDir=sideways",
+    );
+
+    expect(res.status).toBe(400);
+  });
+
+  it("defaults to most-recent-first (lastChecked desc)", async () => {
+    const res = await authedGet("/api/history/DEST_SCHEMA_A/TABLE_A");
+    const dates = res.body.items.map((r) => r.lastChecked);
+    expect(dates).toEqual([...dates].sort().reverse());
+  });
+
+  it("sorts ascending when requested", async () => {
+    const res = await authedGet(
+      "/api/history/DEST_SCHEMA_A/TABLE_A?sortDir=asc",
+    );
+    const dates = res.body.items.map((r) => r.lastChecked);
+    expect(dates).toEqual([...dates].sort());
+  });
+
+  it("matches schema/table case-insensitively", async () => {
+    const res = await authedGet("/api/history/dest_schema_a/table_a");
+    expect(res.status).toBe(200);
+    expect(res.body.items).toHaveLength(3);
   });
 });

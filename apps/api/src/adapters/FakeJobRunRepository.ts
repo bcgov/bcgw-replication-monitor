@@ -3,6 +3,7 @@ import { JobRunRepository } from "../ports/JobRunRepository";
 import { JobRunQuery } from "../domain/JobRunQuery";
 import { JobRunPage } from "../domain/JobRunPage";
 import { sortJobRuns, paginate } from "./queryUtils";
+import { JobHistoryQuery } from "../domain/JobHistoryQuery";
 
 /**
  * Static seed data used when running without a real Oracle connection.
@@ -25,6 +26,42 @@ const SAMPLE: JobRun[] = [
     recordsWritten: 1000,
     dbInstance: "prod",
     logFilename: "fme_table_a_20240115.log",
+  },
+  {
+    gateway: "fme",
+    enabled: true,
+    srcHost: "src-host-1",
+    srcSchema: "SRC_SCHEMA",
+    srcTable: "TABLE_A",
+    destHost: "dest-host-1",
+    destSchema: "DEST_SCHEMA_A",
+    destTable: "TABLE_A",
+    lastChecked: new Date("2024-01-14T10:00:00Z"),
+    lastConverted: new Date("2024-01-14T09:55:00Z"),
+    status: "failed",
+    updateType: "incremental",
+    recordsRead: 800,
+    recordsWritten: 0,
+    dbInstance: "prod",
+    logFilename: "fme_table_a_20240114.log",
+  },
+  {
+    gateway: "fme",
+    enabled: true,
+    srcHost: "src-host-1",
+    srcSchema: "SRC_SCHEMA",
+    srcTable: "TABLE_A",
+    destHost: "dest-host-1",
+    destSchema: "DEST_SCHEMA_A",
+    destTable: "TABLE_A",
+    lastChecked: new Date("2024-01-13T10:00:00Z"),
+    lastConverted: new Date("2024-01-13T09:55:00Z"),
+    status: "success",
+    updateType: "full",
+    recordsRead: 950,
+    recordsWritten: 950,
+    dbInstance: "prod",
+    logFilename: "fme_table_a_20240113.log",
   },
   {
     gateway: "oracle",
@@ -149,5 +186,30 @@ export class FakeJobRunRepository implements JobRunRepository {
     // UPPER-case then dedupe to collapse case variants (matches Oracle)
     const schemas = new Set(this.data.map((r) => r.destSchema.toUpperCase()));
     return Array.from(schemas).sort();
+  }
+
+  /**
+   * Returns all historical runs for a single job from the in-memory data.
+   *
+   * The job is identified by its destination schema + table. Matching is
+   * case-insensitive to stay consistent with the main list (schema names can
+   * appear in mixed case in the source data). Unlike find(), there are no
+   * filters or pagination, the history page shows the full run history for
+   * one job, just sorted.
+   */
+  async findHistory(query: JobHistoryQuery): Promise<JobRun[]> {
+    const schema = query.destSchema.toUpperCase();
+    const table = query.destTable.toUpperCase();
+
+    // Match the specific job (case-insensitive on schema + table)
+    let results = this.data.filter(
+      (r) =>
+        r.destSchema.toUpperCase() === schema &&
+        r.destTable.toUpperCase() === table,
+    );
+
+    results = sortJobRuns(results, query.sortBy, query.sortDir);
+
+    return results;
   }
 }
