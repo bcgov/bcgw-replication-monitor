@@ -144,7 +144,7 @@ export function JobRunsResults({
                   key={`${job.destSchema}.${job.destTable}`}
                   onClick={() =>
                     navigate(
-                      `/history/${encodeURIComponent(`${job.destSchema}.${job.destTable}`)}`,
+                      `/history/${encodeURIComponent(job.destSchema)}/${encodeURIComponent(job.destTable)}`,
                     )
                   }
                 >

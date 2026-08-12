@@ -18,7 +18,10 @@ function App() {
           <Routes>
             <Route path="/" element={<AppLayout />}>
               <Route index element={<JobRunsPage />} />
-              <Route path="history/:jobId" element={<JobHistoryPage />} />
+              <Route
+                path="history/:destSchema/:destTable"
+                element={<JobHistoryPage />}
+              />
             </Route>
           </Routes>
         </AuthGate>

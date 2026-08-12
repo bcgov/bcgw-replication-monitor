@@ -1,5 +1,5 @@
 import { Component, type ReactNode } from "react";
-import { ForbiddenError } from "../api/client"; // adjust path
+import { ForbiddenError } from "../api/client";
 import { AccessDenied } from "./AccessDenied";
 
 interface Props {
