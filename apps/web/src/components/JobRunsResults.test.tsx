@@ -139,7 +139,10 @@ describe("JobRunsResults", () => {
               />
             }
           />
-          <Route path="/history/:jobId" element={<div>History Page</div>} />
+          <Route
+            path="/history/:destSchema/:destTable"
+            element={<div>History Page</div>}
+          />
         </Routes>
       </MemoryRouter>,
     );
