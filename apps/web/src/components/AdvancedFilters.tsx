@@ -53,7 +53,7 @@ export function AdvancedFilters({ value, onChange }: Props) {
 
   return (
     <div className="advanced-filters">
-      <AccordionGroup expandedKeys={["advanced"]}>
+      <AccordionGroup>
         <Accordion id="advanced" label="Advanced Filters">
           <div className="advanced-filters-content">
             <div className="date-filters">
