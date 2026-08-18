@@ -26,6 +26,9 @@ export function JobRunsResults({
 
   const items = data?.items ?? [];
 
+  const sortableClass = (field: string) =>
+    `sortable ${sort.sortBy === field ? "sorted" : ""}`;
+
   const handleSort = (field: string) => {
     if (sort.sortBy === field) {
       // Toggle direction
@@ -51,7 +54,7 @@ export function JobRunsResults({
 
       {items.length > 0 && (
         <div className="table-scroll">
-          <table className="job-runs-table">
+          <table className="job-runs-table clickable-rows">
             {/* Status 
               Method
               Src 
@@ -79,60 +82,69 @@ export function JobRunsResults({
 
             <thead>
               <tr>
-                <th onClick={() => handleSort("status")} className="sortable">
+                <th
+                  onClick={() => handleSort("status")}
+                  className={sortableClass("status")}
+                >
                   Status{renderSortIcon("status")}
                 </th>
-                <th onClick={() => handleSort("gateway")} className="sortable">
+                <th
+                  onClick={() => handleSort("gateway")}
+                  className={sortableClass("gateway")}
+                >
                   Method{renderSortIcon("gateway")}
                 </th>
                 <th
                   onClick={() => handleSort("srcSchema")}
-                  className="sortable"
+                  className={sortableClass("srcSchema")}
                 >
                   Src Schema{renderSortIcon("srcSchema")}
                 </th>
-                <th onClick={() => handleSort("srcTable")} className="sortable">
+                <th
+                  onClick={() => handleSort("srcTable")}
+                  className={sortableClass("srcTable")}
+                >
                   Src Table{renderSortIcon("srcTable")}
                 </th>
                 <th
                   onClick={() => handleSort("destSchema")}
-                  className="sortable"
+                  className={sortableClass("destSchema")}
                 >
                   Dest Schema{renderSortIcon("destSchema")}
                 </th>
                 <th
                   onClick={() => handleSort("destTable")}
-                  className="sortable"
+                  className={sortableClass("destTable")}
                 >
                   Dest Table{renderSortIcon("destTable")}
                 </th>
                 <th
                   onClick={() => handleSort("updateType")}
-                  className="sortable"
+                  className={sortableClass("updateType")}
                 >
                   Update Type{renderSortIcon("updateType")}
                 </th>
                 <th
                   onClick={() => handleSort("recordsRead")}
-                  className="sortable"
+                  className={sortableClass("recordsRead")}
                 >
                   Records Read{renderSortIcon("recordsRead")}
                 </th>
                 <th
                   onClick={() => handleSort("recordsWritten")}
-                  className="sortable"
+                  className={sortableClass("recordsWritten")}
                 >
                   Records Written{renderSortIcon("recordsWritten")}
                 </th>
                 <th
                   onClick={() => handleSort("lastChecked")}
-                  className="sortable"
+                  className={sortableClass("lastChecked")}
                 >
                   Last Checked{renderSortIcon("lastChecked")}
                 </th>
                 <th
                   onClick={() => handleSort("lastConverted")}
-                  className="sortable"
+                  className={sortableClass("lastConverted")}
                 >
                   Last Converted{renderSortIcon("lastConverted")}
                 </th>

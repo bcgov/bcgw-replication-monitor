@@ -51,8 +51,8 @@ describe("JobHistoryPage", () => {
     expect(screen.getByText("DEST_SCHEMA_A")).toBeInTheDocument();
 
     // Last-run badge reflects the latest run status
-    const badge = screen.getByText(/failed/i).closest(".status-badge");
-    expect(badge).toHaveTextContent(/failed/i);
+    const badge = screen.getByText(/Last Run/i).closest(".status-badge");
+    expect(badge).toHaveTextContent(/Failed/i);
   });
 
   it("shows an empty state when there is no history", async () => {
