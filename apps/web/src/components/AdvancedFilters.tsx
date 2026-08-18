@@ -91,7 +91,7 @@ export function AdvancedFilters({ value, onChange }: Props) {
                 })
               }
             >
-              <Label>Schema</Label>
+              <Label>Destination Schema</Label>
               <div className="schema-combobox-field">
                 <Input placeholder="All schemas" />
                 <Button>
