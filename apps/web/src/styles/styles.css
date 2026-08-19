@@ -129,17 +129,25 @@ p.bcds-footer--copyright {
     user-select: none;
   }
 
-  th.sortable:hover {
-    background: #9f9d9c63;
+  th.sorted {
+    background: #d9d9d9;
   }
 
-  tbody tr {
-    cursor: pointer;
+  th.sortable:hover {
+    background: #7f7f7f7e;
   }
 
   tbody tr:hover {
     background: #f9f9f9;
   }
+}
+
+.job-runs-table.clickable-rows tbody tr {
+  cursor: pointer;
+}
+
+.job-runs-table.clickable-rows tbody tr:hover {
+  background: #f9f9f9;
 }
 
 .status-badge {
@@ -267,6 +275,10 @@ p.bcds-footer--copyright {
 
   .status-badge {
     text-align: center;
+  }
+
+  table {
+    margin: 1rem 0 2rem 0;
   }
 }
 

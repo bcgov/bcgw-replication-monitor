@@ -34,11 +34,11 @@ const renderWithClient = (ui: React.ReactElement) => {
 };
 
 describe("AdvancedFilters", () => {
-  it("renders the accordion expanded by default", () => {
+  it("renders the accordion collapsed by default", () => {
     renderWithClient(<AdvancedFilters value={emptyValue} onChange={vi.fn()} />);
 
     const trigger = screen.getByRole("button", { name: /advanced filters/i });
-    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
   });
 
   it("expands to show schema and date controls", async () => {
