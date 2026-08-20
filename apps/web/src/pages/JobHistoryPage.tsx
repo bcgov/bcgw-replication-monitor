@@ -74,6 +74,7 @@ export function JobHistoryPage() {
           <table className="job-runs-table">
             <thead>
               <tr>
+                <th>Method</th>
                 <th>Source Schema</th>
                 <th>Source Table</th>
                 <th>Destination Schema</th>
@@ -82,6 +83,7 @@ export function JobHistoryPage() {
             </thead>
             <tbody>
               <tr>
+                <td>{latestRun.gateway}</td>
                 <td>{latestRun.srcSchema}</td>
                 <td>{latestRun.srcTable}</td>
                 <td>{latestRun.destSchema}</td>
