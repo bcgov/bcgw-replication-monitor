@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { apiFetch } from "../api/client";
@@ -11,6 +11,8 @@ interface HistoryResponse {
 }
 
 export function JobHistoryPage() {
+  const navigate = useNavigate();
+
   const [sort, setSort] = useState({
     sortBy: "lastChecked",
     sortDir: "desc" as "asc" | "desc",
@@ -19,6 +21,23 @@ export function JobHistoryPage() {
     destSchema: string;
     destTable: string;
   }>();
+
+  /**
+   * Breadcrumb navigation back to the landing page.
+   *
+   * If the user navigated here from within the app, go back so their
+   * landing-page filters (stored in the URL) are preserved. If the history page
+   * was opened directly (bookmark, shared link, refresh) there's no in-app
+   * history to return to, so fall back to the landing page.
+   */
+  const handleBreadcrumb = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
 
   const { data, isLoading, isError, isFetching, refetch } =
     useQuery<HistoryResponse>({
@@ -38,7 +57,9 @@ export function JobHistoryPage() {
     <div className="job-history">
       <nav className="navbar">
         <div className="breadcrumb">
-          <Link to="/">BCGW Replication Monitor</Link>
+          <a href="/" onClick={handleBreadcrumb} style={{ cursor: "pointer" }}>
+            BCGW Replication Monitor
+          </a>
           <span>
             {" "}
             &gt; {destSchema}.{destTable}
