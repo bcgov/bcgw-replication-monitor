@@ -8,8 +8,10 @@ import { AdvancedFilters } from "../components/AdvancedFilters";
 import { JobRunsResults } from "../components/JobRunsResults";
 import { SummaryBar } from "../components/SummaryBar";
 import { Pagination } from "../components/Pagination";
-import { useReducer } from "react";
-import { jobRunsQueryReducer, initialQueryState } from "./jobRunsQueryReducer";
+import { useSearchParams } from "react-router-dom";
+import { jobRunsQueryReducer } from "./jobRunsQueryReducer";
+import { parseQueryState, toSearchParams } from "./urlQueryState";
+import type { JobRunsQueryAction } from "./jobRunsQueryReducer";
 import { useDebounce } from "../hooks/useDebounce";
 
 interface JobRunsResponse {
@@ -25,8 +27,18 @@ interface JobRunsResponse {
 }
 
 export function JobRunsPage() {
-  const [query, dispatch] = useReducer(jobRunsQueryReducer, initialQueryState);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // URL is the source of truth: derive the query state from the URL.
+  const query = parseQueryState(searchParams);
   const { filters, search, sort, page, advanced } = query;
+
+  const dispatch = (action: JobRunsQueryAction) => {
+    const next = jobRunsQueryReducer(query, action);
+    // Writes the resulting state back to the URL.
+    setSearchParams(toSearchParams(next), { replace: true });
+  };
+
   const debouncedSearch = useDebounce(search, 300);
 
   const pageSize = 20;
