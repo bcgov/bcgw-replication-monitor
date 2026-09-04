@@ -1,5 +1,4 @@
 import type { JobRun } from "../types/jobRun";
-import { useNavigate } from "react-router-dom";
 
 interface Props {
   data?: {
@@ -22,8 +21,6 @@ export function JobRunsResults({
   sort,
   onSortChange,
 }: Props) {
-  const navigate = useNavigate();
-
   const items = data?.items ?? [];
 
   const sortableClass = (field: string) =>
