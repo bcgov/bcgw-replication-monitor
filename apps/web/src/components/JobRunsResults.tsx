@@ -155,8 +155,10 @@ export function JobRunsResults({
                 <tr
                   key={`${job.destSchema}.${job.destTable}`}
                   onClick={() =>
-                    navigate(
+                    window.open(
                       `/history/${encodeURIComponent(job.destSchema)}/${encodeURIComponent(job.destTable)}`,
+                      "_blank",
+                      "noopener noreferrer",
                     )
                   }
                 >
