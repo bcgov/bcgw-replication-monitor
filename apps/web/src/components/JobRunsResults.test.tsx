@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { JobRunsResults } from "./JobRunsResults";
@@ -121,36 +121,30 @@ describe("JobRunsResults", () => {
     expect(failedBadge).toHaveClass("status-failed");
   });
 
-  it("navigates to history page on row click", async () => {
+  it("opens the job history in a new tab on row click", async () => {
     const user = userEvent.setup();
+    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
 
-    render(
-      <MemoryRouter initialEntries={["/"]}>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <JobRunsResults
-                data={mockData}
-                isLoading={false}
-                isError={false}
-                sort={defaultSort}
-                onSortChange={vi.fn()}
-              />
-            }
-          />
-          <Route
-            path="/history/:destSchema/:destTable"
-            element={<div>History Page</div>}
-          />
-        </Routes>
-      </MemoryRouter>,
+    renderWithRouter(
+      <JobRunsResults
+        data={mockData}
+        isLoading={false}
+        isError={false}
+        sort={defaultSort}
+        onSortChange={vi.fn()}
+      />,
     );
 
     // Click the first data row
     const firstRow = screen.getByText("fme").closest("tr");
     await user.click(firstRow!);
 
-    expect(screen.getByText("History Page")).toBeInTheDocument();
+    expect(openSpy).toHaveBeenCalledWith(
+      "/history/DEST_SCHEMA/TABLE_A",
+      "_blank",
+      "noopener noreferrer",
+    );
+
+    openSpy.mockRestore();
   });
 });
