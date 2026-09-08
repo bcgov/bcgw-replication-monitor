@@ -57,17 +57,6 @@ export function FiltersPanel({ filters, onChange, onResetAll }: Props) {
               <Checkbox value="failed">Failed</Checkbox>
             </CheckboxGroup>
 
-            <CheckboxGroup
-              label="Database"
-              value={filters.dbInstance}
-              onChange={(value: string[]) =>
-                onChange({ ...filters, dbInstance: value })
-              }
-            >
-              <Checkbox value="test">Test</Checkbox>
-              <Checkbox value="prod">Prod</Checkbox>
-            </CheckboxGroup>
-
             <Button variant="secondary" size="small" onPress={onResetAll}>
               Reset Filters
             </Button>

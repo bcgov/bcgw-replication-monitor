@@ -26,7 +26,6 @@ describe("FiltersPanel", () => {
 
     expect(screen.getByText("Method")).toBeInTheDocument();
     expect(screen.getByText("Status")).toBeInTheDocument();
-    expect(screen.getByText("Database")).toBeInTheDocument();
   });
 
   it("applies default checked values", () => {
@@ -44,8 +43,6 @@ describe("FiltersPanel", () => {
 
     expect(screen.getByLabelText("Successful")).toBeChecked();
     expect(screen.getByLabelText("Failed")).toBeChecked();
-
-    expect(screen.getByLabelText("Prod")).toBeChecked();
   });
 
   it("calls onChange when a checkbox is toggled", async () => {
