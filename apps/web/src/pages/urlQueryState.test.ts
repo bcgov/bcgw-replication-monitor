@@ -72,7 +72,7 @@ describe("toSearchParams", () => {
   it("round-trips through parseQueryState", () => {
     const params = new URLSearchParams();
     params.append("status", "failed");
-    params.append("gateway", "oracle");
+    params.append("gateway", "mvw");
     params.set("search", "abc");
     params.set("sortBy", "recordsRead");
     params.set("sortDir", "asc");

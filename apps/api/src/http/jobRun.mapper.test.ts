@@ -45,7 +45,7 @@ describe("toDto", () => {
 
   it("handles null records correctly", () => {
     const run: JobRun = {
-      gateway: "oracle",
+      gateway: "mvw",
       enabled: true,
       srcHost: "src-host-2",
       srcSchema: "SRC",

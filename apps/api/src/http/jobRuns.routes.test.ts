@@ -77,7 +77,7 @@ describe("GET /api/job-runs", () => {
   });
 
   it("filters by multiple gateways", async () => {
-    const res = await authedGet("/api/job-runs?gateway=fme&gateway=oracle");
+    const res = await authedGet("/api/job-runs?gateway=fme&gateway=mvw");
 
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(4);

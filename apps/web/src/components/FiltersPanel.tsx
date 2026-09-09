@@ -38,7 +38,7 @@ export function FiltersPanel({ filters, onChange, onResetAll }: Props) {
               }
             >
               <span title="Oracle Materialized View">
-                <Checkbox value="oracle">MVW</Checkbox>
+                <Checkbox value="mvw">MVW</Checkbox>
               </span>
 
               <Checkbox value="fme">FME</Checkbox>

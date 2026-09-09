@@ -64,7 +64,7 @@ const SAMPLE: JobRun[] = [
     logFilename: "fme_table_a_20240113.log",
   },
   {
-    gateway: "oracle",
+    gateway: "mvw",
     enabled: true,
     srcHost: "src-host-2",
     srcSchema: "SRC_SCHEMA",
