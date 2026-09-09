@@ -54,8 +54,6 @@ export function JobRunsResults({
           <table className="job-runs-table clickable-rows">
             {/* Status 
               Method
-              Src 
-              Src Table
               Dest Schema
               Dest Table
               Update Type
@@ -65,15 +63,13 @@ export function JobRunsResults({
               Last Converted */}
             <colgroup>
               <col style={{ width: "6rem" }} />
-              <col style={{ width: "5rem" }} />
-              <col />
-              <col />
+              <col style={{ width: "6rem" }} />
               <col />
               <col />
               <col style={{ width: "7rem" }} />
               <col style={{ width: "8rem" }} />
-              <col style={{ width: "8rem" }} />
-              <col style={{ width: "9%" }} />
+              <col style={{ width: "9rem" }} />
+              <col style={{ width: "11%" }} />
               <col style={{ width: "11%" }} />
             </colgroup>
 
@@ -90,18 +86,6 @@ export function JobRunsResults({
                   className={sortableClass("gateway")}
                 >
                   Method{renderSortIcon("gateway")}
-                </th>
-                <th
-                  onClick={() => handleSort("srcSchema")}
-                  className={sortableClass("srcSchema")}
-                >
-                  Src Schema{renderSortIcon("srcSchema")}
-                </th>
-                <th
-                  onClick={() => handleSort("srcTable")}
-                  className={sortableClass("srcTable")}
-                >
-                  Src Table{renderSortIcon("srcTable")}
                 </th>
                 <th
                   onClick={() => handleSort("destSchema")}
@@ -165,8 +149,6 @@ export function JobRunsResults({
                     </span>
                   </td>
                   <td>{job.gateway}</td>
-                  <td title={job.srcSchema}>{job.srcSchema}</td>
-                  <td title={job.srcTable}>{job.srcTable}</td>
                   <td title={job.destSchema}>{job.destSchema}</td>
                   <td title={job.destTable}>{job.destTable}</td>
                   <td>{job.updateType}</td>

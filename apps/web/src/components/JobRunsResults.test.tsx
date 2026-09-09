@@ -28,7 +28,7 @@ const mockItems: JobRun[] = [
     logFilename: "fme_table_a.log",
   },
   {
-    gateway: "oracle",
+    gateway: "mvw",
     enabled: true,
     srcHost: "src-host-2",
     srcSchema: "SRC_SCHEMA",
@@ -72,7 +72,7 @@ describe("JobRunsResults", () => {
     expect(screen.getAllByText("TABLE_A").length).toBeGreaterThan(0);
     expect(screen.getAllByText("TABLE_B").length).toBeGreaterThan(0);
     expect(screen.getByText("fme")).toBeInTheDocument();
-    expect(screen.getByText("oracle")).toBeInTheDocument();
+    expect(screen.getByText("mvw")).toBeInTheDocument();
   });
 
   it("shows loading state", () => {
