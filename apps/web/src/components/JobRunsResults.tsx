@@ -148,7 +148,7 @@ export function JobRunsResults({
                       {job.status}
                     </span>
                   </td>
-                  <td>{job.gateway}</td>
+                  <td style={{ textTransform: "uppercase" }}>{job.gateway}</td>
                   <td title={job.destSchema}>{job.destSchema}</td>
                   <td title={job.destTable}>{job.destTable}</td>
                   <td>{job.updateType}</td>
