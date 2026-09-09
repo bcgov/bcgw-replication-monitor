@@ -104,7 +104,9 @@ export function JobHistoryPage() {
             </thead>
             <tbody>
               <tr>
-                <td>{latestRun.gateway}</td>
+                <td style={{ textTransform: "uppercase" }}>
+                  {latestRun.gateway}
+                </td>
                 <td>{latestRun.srcSchema}</td>
                 <td>{latestRun.srcTable}</td>
                 <td>{latestRun.destSchema}</td>
