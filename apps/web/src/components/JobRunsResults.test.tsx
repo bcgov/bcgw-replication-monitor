@@ -75,6 +75,52 @@ describe("JobRunsResults", () => {
     expect(screen.getByText("mvw")).toBeInTheDocument();
   });
 
+  it("defaults a newly selected column to descending", async () => {
+    const user = userEvent.setup();
+    const onSortChange = vi.fn();
+
+    renderWithRouter(
+      <JobRunsResults
+        data={mockData}
+        isLoading={false}
+        isError={false}
+        sort={{ sortBy: "lastChecked", sortDir: "desc" }} // active = lastChecked
+        onSortChange={onSortChange}
+      />,
+    );
+
+    // Click a DIFFERENT (new) column should default to desc
+    await user.click(screen.getByText(/Records Read/i));
+
+    expect(onSortChange).toHaveBeenCalledWith({
+      sortBy: "recordsRead",
+      sortDir: "desc",
+    });
+  });
+
+  it("toggles direction when the active column is clicked", async () => {
+    const user = userEvent.setup();
+    const onSortChange = vi.fn();
+
+    renderWithRouter(
+      <JobRunsResults
+        data={mockData}
+        isLoading={false}
+        isError={false}
+        sort={{ sortBy: "lastChecked", sortDir: "desc" }}
+        onSortChange={onSortChange}
+      />,
+    );
+
+    // Click the ACTIVE column, toggles desc to asc
+    await user.click(screen.getByText(/Last Checked/i));
+
+    expect(onSortChange).toHaveBeenCalledWith({
+      sortBy: "lastChecked",
+      sortDir: "asc",
+    });
+  });
+
   it("shows loading state", () => {
     renderWithRouter(
       <JobRunsResults
