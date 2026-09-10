@@ -133,6 +133,8 @@ export class FakeJobRunRepository implements JobRunRepository {
       results = results.filter(
         (r) =>
           r.destTable.toLowerCase().includes(term) ||
+          r.destSchema.toLowerCase().includes(term) ||
+          r.srcTable.toLowerCase().includes(term) ||
           (r.logFilename?.toLowerCase().includes(term) ?? false),
       );
     }

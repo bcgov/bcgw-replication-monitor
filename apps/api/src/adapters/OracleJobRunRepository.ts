@@ -243,11 +243,13 @@ export class OracleJobRunRepository implements JobRunRepository {
     if (query.search) {
       conditions.push(`
     (
-      LOWER(DEST_TABLE) LIKE :search OR
-      LOWER(LOG_FILENAME) LIKE :search
+      LOWER(DEST_TABLE) LIKE :search ESCAPE '\\' OR
+      LOWER(DEST_SCHEMA) LIKE :search ESCAPE '\\' OR
+      LOWER(SRC_TABLE) LIKE :search ESCAPE '\\' OR
+      LOWER(LOG_FILENAME) LIKE :search ESCAPE '\\'
     )
   `);
-      params.search = `%${query.search.toLowerCase()}%`;
+      params.search = `%${this.escapeLike(query.search.toLowerCase())}%`;
     }
 
     const where =
@@ -348,5 +350,17 @@ export class OracleJobRunRepository implements JobRunRepository {
     if (status === "failed") return ["ERROR"];
     if (status === "success") return ["SUCCESS", "UNCHANGED"];
     return [status.toUpperCase()];
+  }
+
+  /**
+   * Escapes Oracle LIKE wildcards so the user's search term is matched
+   * literally. Backslash is the escape character.
+   * Order: Escape the backslash first, then the wildcards.
+   */
+  private escapeLike(term: string): string {
+    return term
+      .replace(/\\/g, "\\\\") // escape the escape char first
+      .replace(/_/g, "\\_") // literal underscore
+      .replace(/%/g, "\\%"); // literal percent
   }
 }
