@@ -35,7 +35,7 @@ export function JobRunsResults({
       });
     } else {
       // New column, default to asc
-      onSortChange({ sortBy: field, sortDir: "asc" });
+      onSortChange({ sortBy: field, sortDir: "desc" });
     }
   };
 
