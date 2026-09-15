@@ -5,6 +5,8 @@ import {
   ALLOWED_DB_INSTANCES,
   ALLOWED_SORT_FIELDS,
   ALLOWED_SORT_DIRS,
+  ALLOWED_PAGE_SIZES,
+  DEFAULT_PAGE_SIZE,
 } from "../constants/filterDefaults";
 import type { JobRunsQueryState } from "./jobRunsQueryReducer";
 import { initialQueryState } from "./jobRunsQueryReducer";
@@ -22,6 +24,7 @@ const KNOWN_PARAMS = [
   "sortBy",
   "sortDir",
   "page",
+  "pageSize",
 ];
 
 // Keep only values that are in the allowed list
@@ -97,12 +100,21 @@ export function parseQueryState(params: URLSearchParams): JobRunsQueryState {
   const rawPage = Number(params.get("page"));
   const page = Number.isInteger(rawPage) && rawPage >= 0 ? rawPage : 0;
 
+  // --- Page size (must be one of the allowed options, else default) ---
+  const rawPageSize = Number(params.get("pageSize"));
+  const pageSize = ALLOWED_PAGE_SIZES.includes(
+    rawPageSize as (typeof ALLOWED_PAGE_SIZES)[number],
+  )
+    ? rawPageSize
+    : DEFAULT_PAGE_SIZE;
+
   return {
     filters: { status, gateway, dbInstance },
     advanced: { destSchema, lastCheckedFrom, lastCheckedTo },
     search,
     sort: { sortBy, sortDir },
     page,
+    pageSize,
   };
 }
 
@@ -144,6 +156,11 @@ export function toSearchParams(state: JobRunsQueryState): URLSearchParams {
   // Pagination, only write if not the first page
   if (state.page > 0) {
     params.set("page", String(state.page));
+  }
+
+  // Page size, only write if not the default
+  if (state.pageSize !== DEFAULT_PAGE_SIZE) {
+    params.set("pageSize", String(state.pageSize));
   }
 
   return params;

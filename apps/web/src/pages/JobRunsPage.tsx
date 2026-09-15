@@ -31,7 +31,7 @@ export function JobRunsPage() {
 
   // URL is the source of truth: derive the query state from the URL.
   const query = parseQueryState(searchParams);
-  const { filters, search, sort, page, advanced } = query;
+  const { filters, search, sort, page, advanced, pageSize } = query;
 
   const dispatch = (action: JobRunsQueryAction) => {
     const next = jobRunsQueryReducer(query, action);
@@ -41,10 +41,16 @@ export function JobRunsPage() {
 
   const debouncedSearch = useDebounce(search, 300);
 
-  const pageSize = 20;
-
   const { data, isLoading, isError } = useQuery<JobRunsResponse>({
-    queryKey: ["job-runs", filters, advanced, debouncedSearch, sort, page],
+    queryKey: [
+      "job-runs",
+      filters,
+      advanced,
+      debouncedSearch,
+      sort,
+      page,
+      pageSize,
+    ],
     queryFn: () => {
       const params = new URLSearchParams();
       const appendArrayParam = (key: string, values: string[]) => {
@@ -136,6 +142,9 @@ export function JobRunsPage() {
           pageSize={pageSize}
           total={data?.total ?? 0}
           onPageChange={(p) => dispatch({ type: "SET_PAGE", payload: p })}
+          onPageSizeChange={(size) =>
+            dispatch({ type: "SET_PAGE_SIZE", payload: size })
+          }
         />
       </section>
     </div>

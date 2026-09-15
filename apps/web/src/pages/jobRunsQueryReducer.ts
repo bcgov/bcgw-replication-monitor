@@ -23,6 +23,7 @@ export interface JobRunsQueryState {
   search: string;
   sort: Sort;
   page: number;
+  pageSize: number;
 }
 
 export type JobRunsQueryAction =
@@ -31,6 +32,7 @@ export type JobRunsQueryAction =
   | { type: "SET_SEARCH"; payload: string }
   | { type: "SET_SORT"; payload: Sort }
   | { type: "SET_PAGE"; payload: number }
+  | { type: "SET_PAGE_SIZE"; payload: number }
   | { type: "RESET_ALL" };
 
 export const initialQueryState: JobRunsQueryState = {
@@ -43,6 +45,7 @@ export const initialQueryState: JobRunsQueryState = {
   search: "",
   sort: { sortBy: "lastChecked", sortDir: "desc" },
   page: 0,
+  pageSize: 20,
 };
 
 /**
@@ -67,11 +70,14 @@ export function jobRunsQueryReducer(
       return { ...state, sort: action.payload, page: 0 };
     case "SET_PAGE":
       return { ...state, page: action.payload };
+    case "SET_PAGE_SIZE":
+      return { ...state, pageSize: action.payload, page: 0 };
     case "RESET_ALL":
       // Reset filters, advanced filters, search, and page back to initial.
       return {
         ...initialQueryState,
         sort: state.sort,
+        pageSize: state.pageSize, // keep current page size
       };
     default:
       return state;
