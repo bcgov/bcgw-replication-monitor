@@ -262,17 +262,13 @@ describe("GET /api/schemas", () => {
   });
 
   it("filters by lastCheckedFrom", async () => {
-    const res = await authedGet(
-      "/api/job-runs?lastCheckedFrom=2024-01-15T10:03:00.000Z",
-    );
+    const res = await authedGet("/api/job-runs?lastCheckedFrom=2024-01-15");
 
     expect(res.status).toBe(200);
-    // Only rows with lastChecked >= the given time
-    res.body.items.forEach((r: { lastChecked: string }) => {
-      expect(new Date(r.lastChecked).getTime()).toBeGreaterThanOrEqual(
-        new Date("2024-01-15T10:03:00.000Z").getTime(),
-      );
-    });
+    expect(res.body.items).toHaveLength(2);
+    for (const item of res.body.items) {
+      expect(item.lastChecked.startsWith("2024-01-15")).toBe(true);
+    }
   });
 
   it("filters by lastCheckedTo (inclusive of full day)", async () => {

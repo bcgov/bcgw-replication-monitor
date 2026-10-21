@@ -8,6 +8,26 @@ import {
 } from "../domain/JobRun";
 
 /**
+ * Calendar date from a query param, kept as a "YYYY-MM-DD" string
+ * NOT converted to a Date: JS parses date-only strings as
+ * midnight UTC, which shifts the filter by the server's UTC offset
+ * Oracle builds the date itself with TO_DATE, so no time zone is involved
+ */
+const dateOnly = z
+  .string()
+  .trim()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Expected YYYY-MM-DD")
+  .refine((s) => {
+    const [y, m, d] = s.split("-").map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    return (
+      dt.getUTCFullYear() === y &&
+      dt.getUTCMonth() === m - 1 &&
+      dt.getUTCDate() === d
+    );
+  }, "Invalid calendar date");
+
+/**
  * Normalises a query param into an array.
  *
  * Handles:
@@ -34,9 +54,9 @@ export const JobRunsQuerySchema = z.object({
   sortBy: z.enum(JOB_RUN_SORT_FIELDS).default("lastChecked"),
   sortDir: z.enum(SORT_DIRECTIONS).default("desc"),
   // Date range filter on "last checked" (advanced filter).
-  // z.coerce.date() parses ISO strings from query params into Date objects.
-  lastCheckedFrom: z.coerce.date().optional(),
-  lastCheckedTo: z.coerce.date().optional(),
+  // Kept as "YYYY-MM-DD" strings, the repository converts them with TO_DATE
+  lastCheckedFrom: dateOnly.optional(),
+  lastCheckedTo: dateOnly.optional(),
 });
 
 /**

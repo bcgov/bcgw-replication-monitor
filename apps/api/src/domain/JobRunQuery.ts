@@ -15,8 +15,8 @@ export interface JobRunQuery {
   gateway?: JobRunType[];
   dbInstance?: DbInstance[];
   destSchema?: string;
-  lastCheckedFrom?: Date;
-  lastCheckedTo?: Date;
+  lastCheckedFrom?: string;
+  lastCheckedTo?: string;
   limit: number;
   offset: number;
   sortBy: JobRunSortField;

@@ -230,13 +230,17 @@ export class OracleJobRunRepository implements JobRunRepository {
     }
 
     if (query.lastCheckedFrom) {
-      conditions.push("LAST_CHECKED >= :lastCheckedFrom");
+      conditions.push(
+        "LAST_CHECKED >= TO_DATE(:lastCheckedFrom, 'YYYY-MM-DD')",
+      );
       params.lastCheckedFrom = query.lastCheckedFrom;
     }
 
     if (query.lastCheckedTo) {
       // Inclusive of the full day: LAST_CHECKED < (to + 1 day)
-      conditions.push("LAST_CHECKED < :lastCheckedTo + 1");
+      conditions.push(
+        "LAST_CHECKED < TO_DATE(:lastCheckedTo, 'YYYY-MM-DD') + 1",
+      );
       params.lastCheckedTo = query.lastCheckedTo;
     }
 
