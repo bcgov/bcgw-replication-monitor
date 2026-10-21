@@ -140,17 +140,17 @@ export class FakeJobRunRepository implements JobRunRepository {
     }
 
     // Date range filter on "last checked" (advanced filter).
-    // from/to are inclusive bounds; either can be provided independently.
+    // from/to are "YYYY-MM-DD" strings. "T00:00:00" without "Z" = local midnight
+    // Mirrors Oracle: LAST_CHECKED >= from AND LAST_CHECKED < to + 1 day
     if (query.lastCheckedFrom) {
-      const from = query.lastCheckedFrom;
+      const from = new Date(`${query.lastCheckedFrom}T00:00:00`);
       results = results.filter((r) => r.lastChecked >= from);
     }
 
     if (query.lastCheckedTo) {
-      // Make "to" inclusive of the entire selected day (up to 23:59:59.999)
-      const to = new Date(query.lastCheckedTo);
-      to.setHours(23, 59, 59, 999);
-      results = results.filter((r) => r.lastChecked <= to);
+      const toExclusive = new Date(`${query.lastCheckedTo}T00:00:00`);
+      toExclusive.setDate(toExclusive.getDate() + 1);
+      results = results.filter((r) => r.lastChecked < toExclusive);
     }
 
     // Compute counts BEFORE status filter
