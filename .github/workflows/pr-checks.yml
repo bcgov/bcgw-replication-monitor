@@ -77,3 +77,38 @@ jobs:
 
       - name: Security audit
         run: npx audit-ci --config ./audit-ci.jsonc
+
+  sync:
+    name: Sync Checks
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/sync
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Format check
+        run: npx prettier --check "./**/*.{ts,js,json}"
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Test
+        run: npm run test
+
+      - name: Security audit
+        run: npm audit --audit-level=moderate

@@ -1,0 +1,37 @@
+name: Sync Build (dev)
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+    paths:
+      - 'apps/sync/**'
+
+jobs:
+  build:
+    if: github.event.pull_request.merged == true
+    environment: dev
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to OpenShift registry
+        run: |
+          docker login ${{ secrets.PUBLIC_IMAGE_REPOSITORY }} \
+            -u ${{ secrets.OPENSHIFT_SA_NAME }} \
+            -p ${{ secrets.OPENSHIFT_SA_TOOLS_TOKEN }}
+
+      - name: Build & tag image
+        run: |
+          cd apps/sync
+          docker build . -f Dockerfile \
+            -t ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/repl-monitor-sync:${{ github.sha }} \
+            -t ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/repl-monitor-sync:dev
+
+      - name: Push image
+        run: |
+          docker push -a ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/repl-monitor-sync
