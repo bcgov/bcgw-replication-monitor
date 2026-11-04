@@ -1,0 +1,9 @@
+{
+  "moderate": true,
+  "allowlist": [
+    // GHSA-g3hv-75wg-m249: minimatch via eslint (dev-only).
+    // Fix needs minimatch >=11.0.1; eslint still depends on 10.x.
+    // Remove once eslint updates its minimatch dependency.
+    "GHSA-g3hv-75wg-m249",
+  ],
+}
