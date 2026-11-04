@@ -41,7 +41,7 @@ jobs:
         run: npm run test
 
       - name: Security audit
-        run: npx audit-ci --config ./audit-ci.jsonccd
+        run: npx audit-ci --config ./audit-ci.jsonc
 
   web:
     name: Web Checks
@@ -111,4 +111,4 @@ jobs:
         run: npm run test
 
       - name: Security audit
-        run: npx audit-ci --config ./audit-ci.jsonccd
+        run: npx audit-ci --config ./audit-ci.jsonc
