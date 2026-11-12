@@ -1,0 +1,19 @@
+[
+  {
+    "name": "DEST_DB_ENV_KEY",
+    "defaultValue": "DLV",
+    "type": "STRING_OR_CHOICE",
+    "optional": true
+  },
+  {
+    "name": "DEST_TYPE",
+    "defaultValue": ["OTHER"],
+    "type": "CHOICE",
+    "optional": true
+  },
+  {
+    "name": "DEST_SCHEMA",
+    "type": "TEXT",
+    "optional": true
+  }
+]

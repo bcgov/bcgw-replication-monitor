@@ -1,0 +1,56 @@
+{
+  "offset": 0,
+  "limit": 2,
+  "totalCount": 2,
+  "items": [
+    {
+      "id": 1001,
+      "workspace": "example_table_sp_bcgw_sde_bcgw.fmw",
+      "repository": "EXAMPLE_REPO",
+      "status": "SUCCESS",
+      "numLines": 120,
+      "timeStarted": "2026-11-10T10:00:00-08:00",
+      "timeFinished": "2026-11-10T10:00:30-08:00",
+      "sourceType": "SCHEDULES",
+      "sourceName": "example_schedule",
+      "request": {
+        "publishedParameters": [
+          { "name": "DEST_DB_ENV_KEY", "raw": "PRD" },
+          { "name": "DEST_SCHEMA", "raw": "WHSE_EXAMPLE" },
+          { "name": "DEST_FEATURE_1", "raw": "EXAMPLE_TABLE" },
+          { "name": "SRC_PORT", "raw": 1521 },
+          { "name": "DEST_HOST", "raw": "" }
+        ]
+      },
+      "result": {
+        "status": "SUCCESS",
+        "statusMessage": "Translation Successful",
+        "numFeaturesOutput": 250,
+        "timeStarted": "2026-11-10T10:00:00-08:00",
+        "timeFinished": "2026-11-10T10:00:30-08:00"
+      }
+    },
+    {
+      "id": 1000,
+      "workspace": "APP_KIRK__FGDB.fmw",
+      "repository": "KIRK",
+      "status": "FME_FAILURE",
+      "numLines": 0,
+      "timeStarted": "2026-11-10T09:00:00-08:00",
+      "timeFinished": "2026-11-10T09:00:05-08:00",
+      "sourceType": "SCHEDULES",
+      "sourceName": "kirk_example_schedule",
+      "request": {
+        "publishedParameters": [
+          { "name": "KIRK_JOBID", "raw": "42" },
+          { "name": "KIRK_JOBLABEL", "raw": "example_kirk_job" },
+          { "name": "KIRK_DEST_DB_KEY_OVERRIDE", "raw": "PRD" }
+        ]
+      },
+      "result": {
+        "status": "FME_FAILURE",
+        "statusMessage": "Failed to evaluate parameters"
+      }
+    }
+  ]
+}
