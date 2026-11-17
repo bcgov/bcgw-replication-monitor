@@ -2,8 +2,14 @@
   "moderate": true,
   "allowlist": [
     // GHSA-g3hv-75wg-m249: minimatch via eslint (dev-only).
-    // Fix needs minimatch >=11.0.1; eslint still depends on 10.x.
+    // Fix needs minimatch >=11.0.1; eslint 10 still depends on a vulnerable version.
     // Remove once eslint updates its minimatch dependency.
     "GHSA-g3hv-75wg-m249",
+
+    // GHSA-fc5q-39xc-vjpf: picomatch ReDoS via eslint, vite and vitest (dev-only).
+    // Only exploitable with attacker-supplied glob patterns; we only use fixed patterns.
+    // No patched picomatch release exists yet (affects <= 4.0.7). Disputed by the maintainer.
+    // Remove once a fixed picomatch is released and pulled in.
+    "GHSA-fc5q-39xc-vjpf",
   ],
 }
