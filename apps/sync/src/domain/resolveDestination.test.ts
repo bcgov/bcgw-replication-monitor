@@ -33,6 +33,7 @@ const record = (over: Partial<FlowJobRecord> = {}): FlowJobRecord => ({
   sourceName: null,
   datasource: "kirk-src",
   destEnvKey: "PRD",
+  dbInstance: "PROD",
   destInstance: "kirk-host",
   destSchema: "KS",
   destTable: "KT",
