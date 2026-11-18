@@ -37,6 +37,7 @@ const record = (over: Partial<FlowJobRecord>): FlowJobRecord => ({
   sourceName: null,
   datasource: null,
   destEnvKey: "PRD",
+  dbInstance: "PROD",
   destInstance: "prod-host",
   destSchema: "WHSE_X",
   destTable: "T1",

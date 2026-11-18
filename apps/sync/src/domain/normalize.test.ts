@@ -6,6 +6,7 @@ import {
   recordsWritten,
   resolveInstance,
   toStatus,
+  toDbInstance,
 } from "./normalize";
 
 const job = (numFeaturesOutput: number | null): FlowJob => ({
@@ -36,8 +37,6 @@ const dwm = (over: Partial<DwmRow> = {}): DwmRow => ({
   ...over,
 });
 
-const config = { envKeyToHost: { PRD: "prod-host" } };
-
 describe("records", () => {
   it("prefers DWM, falls back to Flow for written", () => {
     expect(recordsWritten(job(9), dwm())).toBe(5);
@@ -63,20 +62,25 @@ describe("toStatus", () => {
   });
 });
 
+describe("toDbInstance", () => {
+  it("maps env keys to the view's values", () => {
+    expect(toDbInstance("PRD")).toBe("PROD");
+    expect(toDbInstance("TST")).toBe("TEST");
+    expect(toDbInstance(null)).toBeNull();
+    expect(toDbInstance("OTHR")).toBeNull();
+  });
+});
+
 describe("resolveInstance", () => {
   it("uses the run's own DWM row first", () => {
-    expect(resolveInstance(dwm(), "PRD", "old", config)).toBe("dwm-host");
-  });
-
-  it("then the env key", () => {
-    expect(resolveInstance(undefined, "PRD", "old", config)).toBe("prod-host");
+    expect(resolveInstance(dwm(), "old")).toBe("dwm-host");
   });
 
   it("then the job's history", () => {
-    expect(resolveInstance(undefined, null, "old", config)).toBe("old");
+    expect(resolveInstance(undefined, "old")).toBe("old");
   });
 
-  it("otherwise UNKNOWN", () => {
-    expect(resolveInstance(undefined, "XYZ", null, config)).toBe("UNKNOWN");
+  it("otherwise UNKNOWN, never a guessed host", () => {
+    expect(resolveInstance(undefined, null)).toBe("UNKNOWN");
   });
 });
