@@ -5,6 +5,7 @@ export type JobCategory = "BCGW" | "NON_BCGW";
 export type FmeStatus = "SUCCESS" | "UNCHANGED" | "ERROR";
 export type ResolvedBy =
   "dwm_exact" | "dwm_history" | "flow_params" | "unmapped";
+export type DbInstance = "PROD" | "TEST";
 
 /** One row of FME_FLOW_JOB. */
 export interface FlowJobRecord {
@@ -24,6 +25,7 @@ export interface FlowJobRecord {
   sourceName: string | null;
   datasource: string | null; // from DWM; feeds src_host / src_table in the view
   destEnvKey: string | null;
+  dbInstance: DbInstance | null; // from the env key; null if the run has none
   destInstance: string; // host name, or UNKNOWN
   destSchema: string; // UNMAPPED if not resolved
   destTable: string | null;
