@@ -13,6 +13,7 @@ const config: SyncConfig = {
   pageSize: 2,
   settleMinutes: 5,
   unresolvedRecentHours: 24,
+  unmappedRetryDays: 30,
 };
 
 const job = (id: number, over: Partial<FlowJob> = {}): FlowJob => ({

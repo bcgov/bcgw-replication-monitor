@@ -104,27 +104,47 @@ describe("FakeFlowJobStore", () => {
     expect(store.rows.get(1)?.destTable).toBe("ORIGINAL");
   });
 
-  it("finds unmapped, unknown-instance and recent unmatched rows", async () => {
+  it("finds BCGW rows to re-check, within each time limit", async () => {
     const now = () => new Date("2026-11-02T12:00:00");
     const store = new FakeFlowJobStore(
       [
         record({ flowJobId: 1 }), // fully resolved
-        record({ flowJobId: 2, destResolvedBy: "unmapped" }),
-        record({ flowJobId: 3, destInstance: UNKNOWN }),
+        record({
+          flowJobId: 2,
+          destResolvedBy: "unmapped",
+          timeStarted: new Date("2026-10-20T08:00:00"),
+        }), // 13 days: retried
+        record({
+          flowJobId: 3,
+          destInstance: UNKNOWN,
+          timeStarted: new Date("2026-10-20T08:00:00"),
+        }), // 13 days: retried
         record({
           flowJobId: 4,
           dwmMatched: false,
           timeStarted: new Date("2026-11-02T08:00:00"),
-        }), // recent
+        }), // recent: retried
         record({
           flowJobId: 5,
           dwmMatched: false,
           timeStarted: new Date("2026-10-01T08:00:00"),
-        }), // old
+        }), // old unmatched: not retried
+        record({
+          flowJobId: 6,
+          destResolvedBy: "unmapped",
+          timeStarted: new Date("2025-11-01T08:00:00"),
+        }), // 1 year: given up
+        record({
+          flowJobId: 7,
+          category: "NON_BCGW",
+          destResolvedBy: "unmapped",
+        }), // NON_BCGW: never
       ],
       now,
     );
-    const ids = (await store.findUnresolved(24)).map((r) => r.flowJobId).sort();
+    const ids = (await store.findUnresolved(24, 30))
+      .map((r) => r.flowJobId)
+      .sort();
     expect(ids).toEqual([2, 3, 4]);
   });
 });
