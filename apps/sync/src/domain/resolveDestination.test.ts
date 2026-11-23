@@ -131,7 +131,7 @@ describe("resolveDestination: KIRK", () => {
       kirk: true,
       params: {},
       kirkHistory: record({ destResolvedBy: "unmapped" }),
-      kirkBatchDwm: dwm({ destTable: "BATCH" }),
+      kirkPreviousRunDwm: dwm({ destTable: "BATCH" }),
     });
     expect(r).toMatchObject({
       destTable: "BATCH",

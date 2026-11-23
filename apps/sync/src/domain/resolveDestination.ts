@@ -13,7 +13,7 @@ export interface DestinationInputs {
   /** KIRK only: latest resolved row for this KIRK_JOBID in our table. */
   kirkHistory?: FlowJobRecord;
   /** KIRK only: DWM row of an earlier run of the same KIRK job, from this sync run. */
-  kirkBatchDwm?: DwmRow;
+  kirkPreviousRunDwm?: DwmRow;
 }
 
 export interface Destination {
@@ -54,7 +54,7 @@ function historyCandidate(i: DestinationInputs): Candidate | undefined {
       instance: h.destInstance === UNKNOWN ? null : clean(h.destInstance),
     };
   }
-  return i.kirkBatchDwm && fromDwm(i.kirkBatchDwm);
+  return i.kirkPreviousRunDwm && fromDwm(i.kirkPreviousRunDwm);
 }
 
 export function resolveDestination(i: DestinationInputs): Destination {
