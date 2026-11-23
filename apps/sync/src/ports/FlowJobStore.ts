@@ -10,10 +10,13 @@ export interface FlowJobStore {
 
   /**
    * Rows that need another resolution attempt:
-   * - destResolvedBy = "unmapped" or destInstance = UNKNOWN (no time limit)
+   * - destResolvedBy = "unmapped" or destInstance = UNKNOWN started within the last `unmappedRetryDays` AND BCGW rows only
    * - no DWM match yet and started within the last `recentHours`
    */
-  findUnresolved(recentHours: number): Promise<FlowJobRecord[]>;
+  findUnresolved(
+    recentHours: number,
+    unmappedRetryDays: number,
+  ): Promise<FlowJobRecord[]>;
 
   /** Update resolution fields only. Flow's own data is never changed. */
   updateResolution(updates: ResolutionUpdate[]): Promise<number>;

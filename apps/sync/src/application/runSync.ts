@@ -39,6 +39,9 @@ export interface SyncConfig {
 
   /** Re-check recent rows that don't yet have an exact DWM match. */
   unresolvedRecentHours: number;
+
+  /** Stop retrying UNMAPPED/UNKNOWN rows older than this. */
+  unmappedRetryDays: number;
 }
 
 export interface SyncSummary {
@@ -328,6 +331,7 @@ async function reResolveStoredJobs(
 ): Promise<number> {
   const unresolved = await deps.store.findUnresolved(
     config.unresolvedRecentHours,
+    config.unmappedRetryDays,
   );
 
   if (unresolved.length === 0) {

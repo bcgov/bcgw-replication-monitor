@@ -30,15 +30,26 @@ export class FakeFlowJobStore implements FlowJobStore {
     return inserted;
   }
 
-  async findUnresolved(recentHours: number): Promise<FlowJobRecord[]> {
-    const cutoff = this.now().getTime() - recentHours * 3_600_000;
+  async findUnresolved(
+    recentHours: number,
+    unmappedRetryDays: number,
+  ): Promise<FlowJobRecord[]> {
+    const nowMs = this.now().getTime();
+    const recentCutoff = nowMs - recentHours * 3_600_000;
+    const unmappedCutoff = nowMs - unmappedRetryDays * 86_400_000;
+
     return [...this.rows.values()]
-      .filter(
-        (r) =>
-          r.destResolvedBy === "unmapped" ||
-          r.destInstance === UNKNOWN ||
-          (!r.dwmMatched && (r.timeStarted?.getTime() ?? 0) >= cutoff),
-      )
+      .filter((r) => {
+        if (r.category !== "BCGW") return false;
+        // no timestamp: treat as just stored
+        const started = r.timeStarted?.getTime() ?? nowMs;
+        const unresolved =
+          r.destResolvedBy === "unmapped" || r.destInstance === UNKNOWN;
+        return (
+          (unresolved && started >= unmappedCutoff) ||
+          (!r.dwmMatched && started >= recentCutoff)
+        );
+      })
       .map((r) => ({ ...r }));
   }
 
