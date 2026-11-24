@@ -6,6 +6,7 @@ import {
   JobCategory,
   ResolutionUpdate,
   ResolvedBy,
+  SkipReason,
 } from "../../domain/FlowJobRecord";
 import { FlowJobStore } from "../../ports/FlowJobStore";
 
@@ -16,7 +17,7 @@ const MAX_IN_VALUES = 1000;
 const WRITE_BATCH_SIZE = 500;
 
 const COLUMNS = `
-  FLOW_JOB_ID, CATEGORY, REPOSITORY, WORKSPACE, KIRK_JOBID, KIRK_JOBLABEL,
+  FLOW_JOB_ID, CATEGORY, SKIP_REASON, REPOSITORY, WORKSPACE, KIRK_JOBID, KIRK_JOBLABEL,
   STATUS, STATUS_RAW, STATUS_MESSAGE, NUM_LINES, TIME_STARTED, TIME_FINISHED,
   SOURCE_TYPE, SOURCE_NAME, DATASOURCE, DEST_ENV_KEY, DB_INSTANCE, DEST_INSTANCE,
   DEST_SCHEMA, DEST_TABLE, DEST_RESOLVED_BY, RECORDS_READ, RECORDS_WRITTEN, DWM_MATCHED
@@ -25,6 +26,7 @@ const COLUMNS = `
 interface FlowJobDbRow {
   FLOW_JOB_ID: number;
   CATEGORY: string;
+  SKIP_REASON: string | null;
   REPOSITORY: string | null;
   WORKSPACE: string | null;
   KIRK_JOBID: string | null;
@@ -57,6 +59,7 @@ const date = { type: oracledb.DATE };
 const INSERT_BIND_DEFS = {
   flowJobId: num,
   category: str(10),
+  skipReason: str(30),
   repository: str(255),
   workspace: str(255),
   kirkJobId: str(50),
@@ -150,7 +153,7 @@ export class OracleFlowJobStore implements FlowJobStore {
       ON (t.FLOW_JOB_ID = s.FLOW_JOB_ID)
       WHEN NOT MATCHED THEN INSERT (${COLUMNS})
       VALUES (
-        :flowJobId, :category, :repository, :workspace, :kirkJobId, :kirkJobLabel,
+        :flowJobId, :category, :skipReason, :repository, :workspace, :kirkJobId, :kirkJobLabel,
         :status, :statusRaw, :statusMessage, :numLines, :timeStarted, :timeFinished,
         :sourceType, :sourceName, :datasource, :destEnvKey, :dbInstance, :destInstance,
         :destSchema, :destTable, :destResolvedBy, :recordsRead, :recordsWritten, :dwmMatched
@@ -284,6 +287,7 @@ export class OracleFlowJobStore implements FlowJobStore {
     return {
       flowJobId: r.FLOW_JOB_ID,
       category: r.CATEGORY as JobCategory,
+      skipReason: r.SKIP_REASON as SkipReason | null,
       repository: r.REPOSITORY ?? "",
       workspace: r.WORKSPACE ?? "",
       kirkJobId: r.KIRK_JOBID,

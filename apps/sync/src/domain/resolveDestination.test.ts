@@ -19,6 +19,7 @@ const dwm = (over: Partial<DwmRow> = {}): DwmRow => ({
 const record = (over: Partial<FlowJobRecord> = {}): FlowJobRecord => ({
   flowJobId: 9,
   category: "BCGW",
+  skipReason: null,
   repository: "KIRK",
   workspace: "APP_KIRK__FGDB.fmw",
   kirkJobId: "42",

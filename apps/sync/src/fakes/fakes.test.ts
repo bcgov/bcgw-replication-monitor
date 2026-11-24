@@ -23,6 +23,7 @@ const job = (id: number, finished: string): FlowJob => ({
 const record = (over: Partial<FlowJobRecord>): FlowJobRecord => ({
   flowJobId: 1,
   category: "BCGW",
+  skipReason: null,
   repository: "REPO",
   workspace: "a.fmw",
   kirkJobId: null,

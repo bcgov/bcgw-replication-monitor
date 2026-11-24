@@ -55,6 +55,7 @@ const record = (
 ): FlowJobRecord => ({
   flowJobId,
   category: "BCGW",
+  skipReason: null,
   repository: "WHSE_TEST",
   workspace: "example_bcgw.fmw",
   kirkJobId: null,
@@ -211,7 +212,7 @@ describe("runSync", () => {
     });
   });
 
-  it("skips DLV and TST jobs", async () => {
+  it("stores DLV and TST jobs as SKIPPED", async () => {
     const d = deps([
       job(1, {
         requestParams: {
@@ -231,9 +232,15 @@ describe("runSync", () => {
 
     const summary = await runSync(d, config);
 
-    expect(summary.inserted).toBe(0);
     expect(summary.skipped).toBe(2);
-    expect(d.store.rows.size).toBe(0);
+    expect(summary.inserted).toBe(2);
+    expect(d.store.rows.get(1)).toMatchObject({
+      category: "SKIPPED",
+      skipReason: "dev_or_test",
+      destEnvKey: "DLV",
+      dbInstance: null,
+      destResolvedBy: "unmapped",
+    });
   });
 
   it("resolves a failed non-KIRK run from the FMW's DWM history", async () => {
@@ -404,9 +411,28 @@ describe("runSync", () => {
     expect(summary).toEqual({
       fetched: 3,
       alreadyStored: 1,
-      inserted: 1,
+      inserted: 2,
       skipped: 1,
       reResolved: 0,
     });
+  });
+
+  it("stops after one page on the next run, even with a skipped job on it", async () => {
+    const dlv = job(4, {
+      requestParams: {
+        DEST_DB_ENV_KEY: "DLV",
+        DEST_SCHEMA: "WHSE_TEST",
+        DEST_FEATURE_1: "A",
+      },
+    });
+    const d = deps([dlv, job(3), job(2), job(1)], [dwm(3), dwm(2), dwm(1)]);
+
+    const first = await runSync(d, config);
+    expect(first.fetched).toBe(4);
+    expect(first.inserted).toBe(4);
+
+    const second = await runSync(d, config);
+    expect(second.fetched).toBe(2); // pageSize 2: only the first page
+    expect(second.inserted).toBe(0);
   });
 });
