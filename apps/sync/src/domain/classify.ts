@@ -1,16 +1,13 @@
 import { FlowJob } from "./FlowJob";
-import { JobCategory } from "./FlowJobRecord";
+import { JobCategory, SkipReason } from "./FlowJobRecord";
 import { envKeyParam, isKirk } from "./params";
 import { UTILITY_REPOSITORY } from "./classificationRules";
-
-export type SkipReason =
-  "utility_repo" | "ignored_workspace" | "dev_or_test" | "no_env_key";
 
 export type Classification =
   | { kind: "skip"; reason: SkipReason }
   | {
       kind: "keep";
-      category: JobCategory;
+      category: Exclude<JobCategory, "SKIPPED">;
       envKey: string | null; // normalized, e.g. "PRD"; null if none
       kirk: boolean;
       unknownEnvKey: boolean; // unexpected value: kept, but log a warning
@@ -33,7 +30,7 @@ export function classify(
   const kirk = isKirk(job);
   const env = (params[envKeyParam(job)] ?? "").trim().toUpperCase();
   const keep = (
-    category: JobCategory,
+    category: Exclude<JobCategory, "SKIPPED">,
     unknownEnvKey = false,
   ): Classification => ({
     kind: "keep",

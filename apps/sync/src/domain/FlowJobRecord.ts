@@ -1,7 +1,8 @@
 export const UNMAPPED = "UNMAPPED";
 export const UNKNOWN = "UNKNOWN";
 
-export type JobCategory = "BCGW" | "NON_BCGW";
+export type JobCategory = "BCGW" | "NON_BCGW" | "SKIPPED";
+export type SkipReason = "utility_repo" | "dev_or_test" | "no_env_key";
 export type FmeStatus = "SUCCESS" | "UNCHANGED" | "ERROR";
 export type ResolvedBy =
   "dwm_exact" | "dwm_history" | "flow_params" | "unmapped";
@@ -11,6 +12,7 @@ export type DbInstance = "PROD" | "TEST";
 export interface FlowJobRecord {
   flowJobId: number;
   category: JobCategory;
+  skipReason: SkipReason | null;
   repository: string;
   workspace: string;
   kirkJobId: string | null;

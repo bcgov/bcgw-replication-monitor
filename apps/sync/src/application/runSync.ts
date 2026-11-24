@@ -1,9 +1,16 @@
 import { DwmRow } from "../domain/DwmRow";
 import { FlowJob } from "../domain/FlowJob";
-import { FlowJobRecord, ResolutionUpdate } from "../domain/FlowJobRecord";
+import {
+  FlowJobRecord,
+  ResolutionUpdate,
+  UNKNOWN,
+  UNMAPPED,
+  SkipReason,
+} from "../domain/FlowJobRecord";
 import { classify } from "../domain/classify";
 import {
   effectiveParams,
+  envKeyParam,
   isKirk,
   KIRK_JOBID,
   KIRK_JOBLABEL,
@@ -206,6 +213,47 @@ async function loadNewJobContext(
 }
 
 /**
+ * A skipped run is still stored, so later syncs count it as "already stored"
+ * and stop paging.
+ */
+function buildSkippedRecord(
+  job: FlowJob,
+  params: Record<string, string>,
+  ownDwm: DwmRow | undefined,
+  reason: SkipReason,
+): FlowJobRecord {
+  const written = recordsWritten(job, ownDwm);
+
+  return {
+    flowJobId: job.id,
+    category: "SKIPPED",
+    skipReason: reason,
+    repository: job.repository,
+    workspace: job.workspace,
+    kirkJobId: job.requestParams[KIRK_JOBID] || null,
+    kirkJobLabel: job.requestParams[KIRK_JOBLABEL] || null,
+    status: toStatus(job.statusRaw, written),
+    statusRaw: job.statusRaw,
+    statusMessage: job.statusMessage,
+    numLines: job.numLines,
+    timeStarted: job.timeStarted,
+    timeFinished: job.timeFinished,
+    sourceType: job.sourceType,
+    sourceName: job.sourceName,
+    datasource: null,
+    destEnvKey: params[envKeyParam(job)]?.trim().toUpperCase() || null,
+    dbInstance: null,
+    destInstance: UNKNOWN,
+    destSchema: UNMAPPED,
+    destTable: null,
+    destResolvedBy: "unmapped",
+    recordsRead: recordsRead(ownDwm),
+    recordsWritten: written,
+    dwmMatched: ownDwm !== undefined,
+  };
+}
+
+/**
  * Phase 3:
  * Turn the discovered Flow jobs into rows for our FME Flow table.
  *
@@ -250,6 +298,9 @@ function buildNewRecords(
 
     if (classification.kind === "skip") {
       summary.skipped++;
+      records.push(
+        buildSkippedRecord(job, params, ownDwm, classification.reason),
+      );
       continue;
     }
 
@@ -273,6 +324,7 @@ function buildNewRecords(
     records.push({
       flowJobId: job.id,
       category: classification.category,
+      skipReason: null,
       repository: job.repository,
       workspace: job.workspace,
 
