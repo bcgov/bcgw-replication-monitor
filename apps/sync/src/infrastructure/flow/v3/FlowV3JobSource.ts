@@ -13,6 +13,7 @@ export interface FlowV3Config {
   requestTimeoutMs?: number; // per attempt, default 30s
   maxAttempts?: number; // default 4
   retryBaseDelayMs?: number; // default 1s, doubled each retry
+  retryMaxDelayMs?: number; // default 10s, cap on the doubling wait
 }
 
 export class FlowApiError extends Error {
@@ -43,6 +44,7 @@ export class FlowV3JobSource implements FlowJobSource {
   private readonly timeoutMs: number;
   private readonly maxAttempts: number;
   private readonly retryBaseDelayMs: number;
+  private readonly retryMaxDelayMs: number;
 
   constructor(
     private readonly config: FlowV3Config,
@@ -53,6 +55,7 @@ export class FlowV3JobSource implements FlowJobSource {
     this.timeoutMs = config.requestTimeoutMs ?? 30_000;
     this.maxAttempts = config.maxAttempts ?? 4;
     this.retryBaseDelayMs = config.retryBaseDelayMs ?? 1_000;
+    this.retryMaxDelayMs = config.retryMaxDelayMs ?? 10_000;
   }
 
   async getCompletedJobs(offset: number, limit: number): Promise<FlowJobPage> {
@@ -109,7 +112,12 @@ export class FlowV3JobSource implements FlowJobSource {
               });
 
         if (!lastError.retryable || attempt === this.maxAttempts) break;
-        await this.sleep(this.retryBaseDelayMs * 2 ** (attempt - 1)); // 1s, 2s, 4s...
+        await this.sleep(
+          Math.min(
+            this.retryBaseDelayMs * 2 ** (attempt - 1),
+            this.retryMaxDelayMs,
+          ),
+        ); // 1s, 2s, 4s, 8s, then 10s
       }
     }
     throw lastError;

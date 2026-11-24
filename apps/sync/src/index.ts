@@ -18,6 +18,7 @@ async function main(): Promise<void> {
       new FlowV3JobSource({
         baseUrl: config.flow.baseUrl,
         token: config.flow.token,
+        maxAttempts: config.flow.maxAttempts,
       }),
       (repository, workspace, err) =>
         log("warn", "Could not read FMW defaults", {

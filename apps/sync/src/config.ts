@@ -16,6 +16,7 @@ const envSchema = z.object({
   ORACLE_CONNECT_STRING: secret,
 
   FLOW_BASE_URL: z.string().trim().url(),
+  FLOW_MAX_ATTEMPTS: z.coerce.number().int().min(1).max(20).default(4),
   DWM_TABLE: tableName,
   FLOW_JOB_TABLE: tableName,
   SYNC_PAGE_SIZE: z.coerce.number().int().min(1).max(1000).default(100),
@@ -25,7 +26,7 @@ const envSchema = z.object({
 });
 
 export interface AppConfig {
-  flow: { baseUrl: string; token: string };
+  flow: { baseUrl: string; token: string; maxAttempts: number };
   oracle: { user: string; password: string; connectString: string };
   tables: { dwm: string; flowJob: string };
   sync: SyncConfig;
@@ -40,7 +41,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const e = result.data;
 
   return {
-    flow: { baseUrl: e.FLOW_BASE_URL, token: e.FLOW_TOKEN },
+    flow: {
+      baseUrl: e.FLOW_BASE_URL,
+      token: e.FLOW_TOKEN,
+      maxAttempts: e.FLOW_MAX_ATTEMPTS,
+    },
     oracle: {
       user: e.ORACLE_USER,
       password: e.ORACLE_PASSWORD,
