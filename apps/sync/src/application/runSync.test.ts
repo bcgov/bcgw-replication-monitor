@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DwmRow } from "../domain/DwmRow";
 import { FlowJob } from "../domain/FlowJob";
-import { FlowJobRecord, UNKNOWN } from "../domain/FlowJobRecord";
+import { FlowJobRecord } from "../domain/FlowJobRecord";
 import { FakeDwmLookup } from "../fakes/FakeDwmLookup";
 import { FakeFlowJobSource } from "../fakes/FakeFlowJobSource";
 import { FakeFlowJobStore } from "../fakes/FakeFlowJobStore";
