@@ -377,6 +377,13 @@ function buildNewRecords(
  *
  * This runs even when Flow has no new jobs.
  */
+
+/** True if any resolution field differs from what's stored. */
+function hasChanged(stored: FlowJobRecord, update: ResolutionUpdate): boolean {
+  return (Object.keys(update) as (keyof ResolutionUpdate)[]).some(
+    (key) => update[key] !== stored[key],
+  );
+}
 async function reResolveStoredJobs(
   deps: SyncDependencies,
   config: SyncConfig,
@@ -484,7 +491,10 @@ async function reResolveStoredJobs(
     };
   });
 
-  return deps.store.updateResolution(updates);
+  const changed = updates.filter((update, i) =>
+    hasChanged(unresolved[i], update),
+  );
+  return deps.store.updateResolution(changed);
 }
 
 export async function runSync(
