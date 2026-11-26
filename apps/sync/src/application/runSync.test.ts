@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DwmRow } from "../domain/DwmRow";
 import { FlowJob } from "../domain/FlowJob";
-import { FlowJobRecord } from "../domain/FlowJobRecord";
+import { FlowJobRecord, UNKNOWN } from "../domain/FlowJobRecord";
 import { FakeDwmLookup } from "../fakes/FakeDwmLookup";
 import { FakeFlowJobSource } from "../fakes/FakeFlowJobSource";
 import { FakeFlowJobStore } from "../fakes/FakeFlowJobStore";
@@ -414,6 +414,7 @@ describe("runSync", () => {
       inserted: 2,
       skipped: 1,
       reResolved: 0,
+      unknownEnvKeys: 0,
     });
   });
 

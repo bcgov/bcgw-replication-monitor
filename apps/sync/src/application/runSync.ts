@@ -57,6 +57,7 @@ export interface SyncSummary {
   inserted: number;
   skipped: number;
   reResolved: number;
+  unknownEnvKeys: number;
 }
 
 interface NewJobContext {
@@ -73,6 +74,7 @@ function createSummary(): SyncSummary {
     inserted: 0,
     skipped: 0,
     reResolved: 0,
+    unknownEnvKeys: 0,
   };
 }
 
@@ -302,6 +304,10 @@ function buildNewRecords(
         buildSkippedRecord(job, params, ownDwm, classification.reason),
       );
       continue;
+    }
+
+    if (classification.unknownEnvKey) {
+      summary.unknownEnvKeys++;
     }
 
     const kirkJobId = job.requestParams[KIRK_JOBID] || null;
