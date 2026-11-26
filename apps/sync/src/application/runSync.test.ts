@@ -414,6 +414,7 @@ describe("runSync", () => {
       inserted: 2,
       skipped: 1,
       reResolved: 0,
+      unknownEnvKeys: 0,
     });
   });
 
@@ -434,5 +435,24 @@ describe("runSync", () => {
     const second = await runSync(d, config);
     expect(second.fetched).toBe(2); // pageSize 2: only the first page
     expect(second.inserted).toBe(0);
+  });
+
+  it("does not count unchanged rows as re-resolved", async () => {
+    const stored = record(60, {
+      destResolvedBy: "unmapped",
+      destSchema: "UNMAPPED",
+      destTable: null,
+      destInstance: "UNKNOWN",
+      datasource: null,
+      dwmMatched: false,
+      recordsRead: null,
+      recordsWritten: 5,
+      status: "SUCCESS",
+    });
+
+    const d = deps([], [], [stored]);
+    const summary = await runSync(d, config);
+
+    expect(summary.reResolved).toBe(0);
   });
 });

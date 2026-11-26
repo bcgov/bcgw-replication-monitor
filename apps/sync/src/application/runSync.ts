@@ -57,6 +57,7 @@ export interface SyncSummary {
   inserted: number;
   skipped: number;
   reResolved: number;
+  unknownEnvKeys: number;
 }
 
 interface NewJobContext {
@@ -73,6 +74,7 @@ function createSummary(): SyncSummary {
     inserted: 0,
     skipped: 0,
     reResolved: 0,
+    unknownEnvKeys: 0,
   };
 }
 
@@ -304,6 +306,10 @@ function buildNewRecords(
       continue;
     }
 
+    if (classification.unknownEnvKey) {
+      summary.unknownEnvKeys++;
+    }
+
     const kirkJobId = job.requestParams[KIRK_JOBID] || null;
 
     const destination = resolveDestination({
@@ -377,6 +383,13 @@ function buildNewRecords(
  *
  * This runs even when Flow has no new jobs.
  */
+
+/** True if any resolution field differs from what's stored. */
+function hasChanged(stored: FlowJobRecord, update: ResolutionUpdate): boolean {
+  return (Object.keys(update) as (keyof ResolutionUpdate)[]).some(
+    (key) => update[key] !== stored[key],
+  );
+}
 async function reResolveStoredJobs(
   deps: SyncDependencies,
   config: SyncConfig,
@@ -484,7 +497,10 @@ async function reResolveStoredJobs(
     };
   });
 
-  return deps.store.updateResolution(updates);
+  const changed = updates.filter((update, i) =>
+    hasChanged(unresolved[i], update),
+  );
+  return deps.store.updateResolution(changed);
 }
 
 export async function runSync(
